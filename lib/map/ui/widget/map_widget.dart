@@ -18,6 +18,8 @@ import '../../bloc/my_location_cubit/my_location_cubit.dart';
 import '../../bloc/set_point_cubit/map_control_cubit.dart';
 import '../../data/models/my_marker.dart';
 
+final  initialPoint = LatLng(33.30, 36.17);
+
 class CachedTileProvider extends TileProvider {
   @override
   ImageProvider<Object> getImage(TileCoordinates coordinates, TileLayer options) {
@@ -94,7 +96,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  late MyLocationCubit myLocationCubit;
+
   late MapControllerCubit mapControllerCubit;
 
   final mapWidgetKey = GlobalKey();
@@ -109,16 +111,6 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         BlocListener<AtherCubit, AtherInitial>(
           listener: (context, state) {
             // controller.move(state.result.getLatLng(), controller.zoom);
-          },
-        ),
-        BlocListener<MyLocationCubit, MyLocationInitial>(
-          listenWhen: (p, c) => c.state == CubitStatuses.done,
-          listener: (context, state) async {
-            if (mapControllerCubit.state.centerZoomPoints.isNotEmpty) return;
-            if (mapControllerCubit.state.point == null) return;
-            if (mapControllerCubit.state.markers.isNotEmpty) return;
-
-            await controller.animateTo(dest: state.result, zoom: 15);
           },
         ),
         BlocListener<MapControllerCubit, MapControllerInitial>(
@@ -142,6 +134,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         mapController: controller,
         options: MapOptions(
           maxZoom: maxZoom,
+          center: initialPoint,
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onMapReady: () {
             if (widget.initialPoint != null && widget.initialPoint!.latitude != 0) {
@@ -149,7 +142,6 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               mapControllerCubit.addSingleMarker(
                   marker: MyMarker(point: widget.initialPoint!));
             } else {
-              myLocationCubit.getMyLocation(context, moveMap: true);
             }
 
             // controller.centerOnPoints(points);
@@ -260,7 +252,6 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    myLocationCubit = context.read<MyLocationCubit>();
     mapControllerCubit = context.read<MapControllerCubit>();
 
     context.read<AtherCubit>().getDriverLocation(imeis);
