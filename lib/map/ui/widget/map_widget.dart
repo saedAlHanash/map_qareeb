@@ -18,7 +18,7 @@ import '../../bloc/my_location_cubit/my_location_cubit.dart';
 import '../../bloc/set_point_cubit/map_control_cubit.dart';
 import '../../data/models/my_marker.dart';
 
-final  initialPoint = LatLng(33.30, 36.17);
+final initialPoint = LatLng(33.30, 36.17);
 
 class CachedTileProvider extends TileProvider {
   @override
@@ -96,7 +96,6 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     setState(() {});
   }
 
-
   late MapControllerCubit mapControllerCubit;
 
   final mapWidgetKey = GlobalKey();
@@ -141,8 +140,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               controller.animateTo(dest: widget.initialPoint!, zoom: 15);
               mapControllerCubit.addSingleMarker(
                   marker: MyMarker(point: widget.initialPoint!));
-            } else {
-            }
+            } else {}
 
             // controller.centerOnPoints(points);
             if (widget.onMapReady != null) {
@@ -293,7 +291,36 @@ class MapTypeSpinner extends StatelessWidget {
     return Positioned(
       top: 30.0.h,
       right: 10.0.w,
-      child: const SizedBox.shrink(),
+      child: PopupMenuButton<MapType>(
+        initialValue: context.read<MapControlCubit>().state.type,
+        onSelected: (MapType item) {
+          context.read<MapControlCubit>().changeMapType(item, controller.center);
+        },
+        child: const Card(
+          elevation: 3.0,
+          color: Color(0xFFF5F5F5),
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Icon(Icons.layers_rounded, color: Colors.green),
+          ),
+        ),
+        itemBuilder: (BuildContext context) {
+          return <PopupMenuEntry<MapType>>[
+            const PopupMenuItem<MapType>(
+              value: MapType.normal,
+              child: Text('خريطة عادية'),
+            ),
+            const PopupMenuItem<MapType>(
+              value: MapType.word,
+              child: Text('قمر صناعي'),
+            ),
+            const PopupMenuItem<MapType>(
+              value: MapType.mix,
+              child: Text('مختلطة'),
+            ),
+          ];
+        },
+      ),
       // child: SpinnerWidget(
       //   items: mapTypeList,
       //   width: 50.0.w,
