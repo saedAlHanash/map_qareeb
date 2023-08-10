@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:equatable/equatable.dart';
@@ -53,7 +54,7 @@ class AtherCubit extends Cubit<AtherInitial> {
     );
 
     if (pair.first != null) {
-      return Pair(AtherResponse.fromJson(pair.first, ime).imes, null);
+      return Pair(AtherResponse.fromJson(jsonDecode(pair.first), ime).imes, null);
     } else {
       return Pair(null, pair.second?.body ?? '');
     }
@@ -90,7 +91,7 @@ class AtherCubit extends Cubit<AtherInitial> {
 
     if (pair.first != null) {
       final list = <LatLng>[];
-      var f1 = pair.first;
+      var f1 = jsonDecode(pair.first);
       for (var e in f1) {
         list.add(LatLng(double.parse(e[1]), double.parse(e[2])));
       }
