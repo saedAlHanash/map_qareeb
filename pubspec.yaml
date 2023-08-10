@@ -27,6 +27,9 @@ dependencies:
   qareeb_models:
     git:
       url: https://github.com/saedAlHanash/qareeb_models
+      ref: _0.0.7
+
+
 
   flutter_bloc: any
   #  dartz: ^0.10.1
