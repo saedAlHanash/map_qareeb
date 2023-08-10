@@ -34,7 +34,7 @@ class AtherCubit extends Cubit<AtherInitial> {
 
   Future<Pair<List<Ime>?, String?>> _getDriverLocationApi(List<String> ime) async {
     // var ime = '359632104211708';
-
+    APIService().initBaseUrl(baseUrl: 'live.qareeb-maas.com');
     final pair = await getServerProxyApi(
       request: ApiServerRequest(
         url: APIService()
@@ -68,20 +68,29 @@ class AtherCubit extends Cubit<AtherInitial> {
     if (end == null) return 0;
     if (ime.isEmpty) return 0;
     // var ime = '359632104211708';
-    final response = await APIService().getApi(
-        url: 'api/api.php',
-        query: {
-          'api': 'user',
-          'ver': '1.0',
-          'key': atherKey,
-          'cmd':
-              'OBJECT_GET_MESSAGES,$ime,${start.formatDateAther},${end.formatDateAther}',
-        },
-        hostName: 'admin.alather.net');
+    APIService().initBaseUrl(baseUrl: 'live.qareeb-maas.com');
 
-    if (response.statusCode == 200) {
+    final pair = await getServerProxyApi(
+      request: ApiServerRequest(
+        url: APIService()
+            .getUri(
+              url: 'api/api.php',
+              query: {
+                'api': 'user',
+                'ver': '1.0',
+                'key': atherKey,
+                'cmd':
+                    'OBJECT_GET_MESSAGES,$ime,${start.formatDateAther},${end.formatDateAther}',
+              },
+              hostName: 'admin.alather.net',
+            )
+            .toString(),
+      ),
+    );
+
+    if (pair.first != null) {
       final list = <LatLng>[];
-      var f1 = response.json;
+      var f1 = pair.first;
       for (var e in f1) {
         list.add(LatLng(double.parse(e[1]), double.parse(e[2])));
       }
