@@ -16,7 +16,6 @@ import '../../../generated/assets.dart';
 import '../../animate_marker/animated_marker_layer.dart';
 import '../../bloc/ather_cubit/ather_cubit.dart';
 import '../../bloc/map_controller_cubit/map_controller_cubit.dart';
-import '../../bloc/my_location_cubit/my_location_cubit.dart';
 import '../../bloc/set_point_cubit/map_control_cubit.dart';
 import '../../data/models/my_marker.dart';
 
