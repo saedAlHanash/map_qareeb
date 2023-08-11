@@ -11,9 +11,7 @@ import 'package:qareeb_models/points/data/model/trip_point.dart';
 
 import '../../../generated/assets.dart';
 
-
 extension IconPoint on num {
-
   String get iconPoint {
     switch (toInt()) {
       case 0:
@@ -28,6 +26,7 @@ extension IconPoint on num {
     return Assets.iconsE;
   }
 }
+
 class MyMarker {
   LatLng point;
   num? key;
@@ -47,7 +46,7 @@ class MyMarker {
     this.type = MyMarkerType.location,
   });
 
-  Marker getWidget(int index) {
+  Marker getWidget(int index, {Function(MyMarker marker)? onTapMarker}) {
     switch (type) {
       case MyMarkerType.location:
         return Marker(
@@ -73,43 +72,36 @@ class MyMarker {
       case MyMarkerType.point:
         return Marker(
           point: point,
-          height: 70.0.r,
-          width: 70.0.r,
+          height: 90.0.spMin,
+          width: 150.0.spMin,
           builder: (context) {
             return InkWell(
-              onTap: null,
+              onTap: onTapMarker == null
+                  ? null
+                  : () => onTapMarker.call(this),
               child: Column(
                 children: [
-                  Transform.rotate(
-                    angle: bearing ?? 0.0,
-                    child: Container(
-                      height: 30,
-                      width: 30,
-                      padding: const EdgeInsets.all(5.0).r,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const ImageMultiType(
-                        url: Assets.iconsMainColorMarker,
-                        height: 25.0,
-                        width: 25.0,
-                      ),
-                    ),
+                  const ImageMultiType(
+                    url: Assets.iconsMainColorMarker,
+                    height: 35.0,
+                    width: 35.0,
+                    color: Colors.black,
                   ),
                   if (item is TripPoint)
                     Container(
-                      width: 70.0.r,
+                      width: 150.0.spMin,
                       color: Colors.white,
                       padding: const EdgeInsets.all(3.0).r,
                       child: DrawableText(
+                        selectable: false,
                         text: (item as TripPoint).arName,
-                        size: 12.0.sp,
-                        maxLines: 1,
+                        size: 15.0.sp,
+                        maxLines: 2,
+                        fontFamily: FontManager.cairoBold,
                         matchParent: true,
                         textAlign: TextAlign.center,
                       ),
-                    )
+                    ),
                 ],
               ),
             );

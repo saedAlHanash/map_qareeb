@@ -19,20 +19,6 @@ import '../../bloc/map_controller_cubit/map_controller_cubit.dart';
 import '../../bloc/set_point_cubit/map_control_cubit.dart';
 import '../../data/models/my_marker.dart';
 
-final initialPoint = LatLng(33.30, 36.17);
-
-class CachedTileProvider extends TileProvider {
-  @override
-  ImageProvider<Object> getImage(TileCoordinates coordinates, TileLayer options) {
-    return CachedNetworkImageProvider(
-      getTileUrl(coordinates, options),
-      //Now you can set options that determine how the image gets cached via whichever plugin you use.
-    );
-  }
-}
-
-final List<String> imeis = [];
-
 class MapWidget extends StatefulWidget {
   const MapWidget({
     Key? key,
@@ -41,11 +27,13 @@ class MapWidget extends StatefulWidget {
     this.search,
     this.updateMarkerWithZoom,
     this.onMapClick,
+    this.onTapMarker,
   }) : super(key: key);
 
   final Function(MapController controller)? onMapReady;
   final Function(LatLng latLng)? onMapClick;
   final Function()? search;
+  final Function(MyMarker marker)? onTapMarker;
   final LatLng? initialPoint;
   final bool? updateMarkerWithZoom;
 
@@ -141,7 +129,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         mapController: controller,
         options: MapOptions(
           maxZoom: maxZoom,
-          center: initialPoint,
+          center: widget.initialPoint ?? initialPoint,
           onPositionChanged: (position, hasGesture) {
             // Fill your stream when your position changes
             final zoom = position.zoom;
@@ -150,18 +138,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
             }
           },
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
-          onMapReady: () {
-            if (widget.initialPoint != null && widget.initialPoint!.latitude != 0) {
-              controller.animateTo(dest: widget.initialPoint!, zoom: 15);
-              mapControllerCubit.addSingleMarker(
-                  marker: MyMarker(point: widget.initialPoint!));
-            } else {}
-
-            // controller.centerOnPoints(points);
-            if (widget.onMapReady != null) {
-              widget.onMapReady!(controller);
-            }
-          },
+          onMapReady: () => widget.onMapReady?.call(controller),
           onTap: widget.onMapClick == null
               ? null
               : (tapPosition, point) {
@@ -170,7 +147,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                   );
                   widget.onMapClick!.call(point);
                 },
-          zoom: 16.0,
+          zoom: 12.0,
         ),
         nonRotatedChildren: [
           MapTypeSpinner(
@@ -207,7 +184,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
             },
             builder: (context, state) {
               return PolylineLayer(
-                polylines: MapHelper.initPolyline(state),
+                polylines: initPolyline(state),
               );
             },
           ),
@@ -215,7 +192,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
             buildWhen: (p, c) => p.markerNotifier != c.markerNotifier,
             builder: (context, state) {
               return MarkerLayer(
-                markers: MapHelper.initMarker(state),
+                markers: initMarker(state),
               );
             },
           ),
@@ -293,6 +270,30 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     _streamController.close();
     super.dispose();
   }
+
+  List<Marker> initMarker(MapControllerInitial state) {
+    return state.markers.values
+        .mapIndexed(
+          (i, e) {
+            return e.getWidget(i,onTapMarker: widget.onTapMarker);
+          },
+        )
+        .take(state.mapZoom.getZoomMarkerCount)
+        .toList();
+  }
+
+  List<Polyline> initPolyline(MapControllerInitial state) {
+    return state.polyLines.values.mapIndexed(
+      (i, e) {
+        return Polyline(
+          points: e.first,
+          color: e.second,
+          strokeCap: StrokeCap.round,
+          strokeWidth: 5.0.spMin,
+        );
+      },
+    ).toList();
+  }
 }
 
 //---------------------------------------
@@ -363,30 +364,6 @@ class MapTypeSpinner extends StatelessWidget {
   }
 }
 
-class MapHelper {
-  static List<Marker> initMarker(MapControllerInitial state) {
-    return state.markers.values
-        .mapIndexed(
-          (i, e) => e.getWidget(i),
-        )
-        .take(state.mapZoom.getZoomMarkerCount)
-        .toList();
-  }
-
-  static List<Polyline> initPolyline(MapControllerInitial state) {
-    return state.polyLines.values.mapIndexed(
-      (i, e) {
-        return Polyline(
-          points: e.first,
-          color: e.second,
-          strokeCap: StrokeCap.round,
-          strokeWidth: 5.0.spMin,
-        );
-      },
-    ).toList();
-  }
-}
-
 extension DoubleHealper on double {
   int get getZoomMarkerCount {
     if (this >= 10 && this < 13 || this < 10) return 10;
@@ -396,5 +373,19 @@ extension DoubleHealper on double {
     if (this > 16) return 100000;
 
     return 100000;
+  }
+}
+
+final List<String> imeis = [];
+
+final initialPoint = LatLng(33.514631885313264, 36.27654397981723);
+
+class CachedTileProvider extends TileProvider {
+  @override
+  ImageProvider<Object> getImage(TileCoordinates coordinates, TileLayer options) {
+    return CachedNetworkImageProvider(
+      getTileUrl(coordinates, options),
+      //Now you can set options that determine how the image gets cached via whichever plugin you use.
+    );
   }
 }
