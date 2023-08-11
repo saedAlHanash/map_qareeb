@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +40,7 @@ class MapWidget extends StatefulWidget {
     this.onMapReady,
     this.initialPoint,
     this.search,
+    this.updateMarkerWithZoom,
     this.onMapClick,
   }) : super(key: key);
 
@@ -45,6 +48,7 @@ class MapWidget extends StatefulWidget {
   final Function(LatLng latLng)? onMapClick;
   final Function()? search;
   final LatLng? initialPoint;
+  final bool? updateMarkerWithZoom;
 
   static initImeis(List<String> imei) => imeis
     ..clear()
@@ -100,6 +104,11 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
   final mapWidgetKey = GlobalKey();
 
+  // Create your stream
+  final _streamController = StreamController<double>();
+
+  Stream<double> get onZoomChanged => _streamController.stream;
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -134,6 +143,13 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         options: MapOptions(
           maxZoom: maxZoom,
           center: initialPoint,
+          onPositionChanged: (position, hasGesture) {
+            // Fill your stream when your position changes
+            final zoom = position.zoom;
+            if (zoom != null) {
+              _streamController.sink.add(zoom);
+            }
+          },
           interactiveFlags: InteractiveFlag.pinchZoom | InteractiveFlag.drag,
           onMapReady: () {
             if (widget.initialPoint != null && widget.initialPoint!.latitude != 0) {
@@ -252,6 +268,12 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
     mapControllerCubit = context.read<MapControllerCubit>();
 
+    // Add your listener
+    onZoomChanged.listen((event) {
+      if (widget.updateMarkerWithZoom ?? false) {
+        mapControllerCubit.updateMarkersWithZoom(event);
+      }
+    });
     context.read<AtherCubit>().getDriverLocation(imeis);
     stream.takeWhile((element) {
       return mounted;
@@ -269,6 +291,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   @override
   void dispose() {
     controller.dispose();
+    _streamController.close();
     super.dispose();
   }
 }
