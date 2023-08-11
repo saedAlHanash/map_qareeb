@@ -343,20 +343,36 @@ class MapTypeSpinner extends StatelessWidget {
 
 class MapHelper {
   static List<Marker> initMarker(MapControllerInitial state) {
-    return state.markers.values.mapIndexed((i, e) => e.getWidget(i)).toList();
+    return state.markers.values
+        .mapIndexed(
+          (i, e) => e.getWidget(i),
+        )
+        .take(state.mapZoom.getZoomMarkerCount)
+        .toList();
   }
 
   static List<Polyline> initPolyline(MapControllerInitial state) {
     return state.polyLines.values.mapIndexed(
       (i, e) {
-        var color = Colors.black;
         return Polyline(
-          points: e,
-          color: color,
+          points: e.first,
+          color: e.second,
           strokeCap: StrokeCap.round,
           strokeWidth: 5.0.spMin,
         );
       },
     ).toList();
+  }
+}
+
+extension DoubleHealper on double {
+  int get getZoomMarkerCount {
+    if (this >= 10 && this < 13 || this < 10) return 10;
+    if (this >= 13 && this < 14) return 15;
+    if (this >= 14 && this < 15) return 30;
+    if (this >= 15 && this < 16) return 40;
+    if (this > 16) return 100000;
+
+    return 100000;
   }
 }

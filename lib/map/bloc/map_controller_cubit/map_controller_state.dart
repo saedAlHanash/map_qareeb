@@ -19,10 +19,12 @@ class MapControllerInitial {
 
   ///all poly lines that drawn over Map,
   ///Key is hash is : end point hashing (for find and delete )
-  final Map<num, List<LatLng>> polyLines = {};
+  final Map<num, Pair<List<LatLng>,Color>> polyLines = {};
+
 
   final int markerNotifier;
   final int polylineNotifier;
+  final double mapZoom;
 
   final centerZoomPoints = <LatLng>[];
 
@@ -31,6 +33,7 @@ class MapControllerInitial {
     this.markerNotifier = 0,
     this.polylineNotifier = 0,
     this.zoom = 15,
+    this.mapZoom = 11,
     required this.initialPoint,
     this.oldPoint,
     required this.bearing,
@@ -61,6 +64,7 @@ class MapControllerInitial {
     LatLng? oldPoint,
     double? bearing,
     double? zoom,
+        double? mapZoom,
     int? markerNotifier,
     int? polylineNotifier,
   }) {
@@ -72,6 +76,7 @@ class MapControllerInitial {
       oldPoint: oldPoint ?? this.oldPoint,
       bearing: bearing ?? this.bearing,
       zoom: zoom ?? this.zoom,
+              mapZoom: mapZoom ?? this.mapZoom,
     )
       ..markers.addAll(markers)
       ..polyLines.addAll(polyLines)

@@ -83,18 +83,17 @@ class MyMarker {
                   Transform.rotate(
                     angle: bearing ?? 0.0,
                     child: Container(
-                      height: 40.r,
-                      width: 40.r,
+                      height: 30,
+                      width: 30,
                       padding: const EdgeInsets.all(5.0).r,
                       decoration: const BoxDecoration(
-                        color: Colors.black,
+                        color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: ImageMultiType(
-                        url: Assets.iconsLogoWithoutText,
-                        color: Colors.white,
-                        height: 30.0.r,
-                        width: 30.0.r,
+                      child: const ImageMultiType(
+                        url: Assets.iconsMainColorMarker,
+                        height: 25.0,
+                        width: 25.0,
                       ),
                     ),
                   ),

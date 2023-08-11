@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -11,6 +12,7 @@ import 'package:qareeb_models/booking/trip_mediator.dart';
 import 'package:qareeb_models/extensions.dart';
 import 'package:qareeb_models/global.dart';
 import 'package:qareeb_models/osrm/data/response/osrm_model.dart';
+import 'package:qareeb_models/points/data/model/trip_point.dart';
 import 'package:qareeb_models/trip_path/data/models/trip_path.dart';
 import 'package:qareeb_models/trip_process/data/response/trip_response.dart';
 import 'package:saed_http/api_manager/api_service.dart';
@@ -197,7 +199,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
 
     if (pair.first != null) {
       var list = decodePolyline(pair.first!.routes.first.geometry).unpackPolyline();
-      state.polyLines[key ?? end.hashCode] = list;
+      state.polyLines[key ?? end.hashCode] = Pair(list, Colors.black);
       emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
     }
   }
@@ -206,16 +208,26 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     if (myPolyLine.key == null && myPolyLine.endPoint == null) return;
 
     var list = decodePolyline(myPolyLine.encodedPolyLine).unpackPolyline();
-    state.polyLines[myPolyLine.key ?? myPolyLine.endPoint.hashCode] = list;
+    state.polyLines[myPolyLine.key ?? myPolyLine.endPoint.hashCode] =
+        Pair(list, myPolyLine.color ?? Colors.black);
 
     emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
   }
 
   void addEncodedPolyLines({required List<MyPolyLine> myPolyLines, bool update = true}) {
+    state.polyLines.clear();
     for (var e in myPolyLines) {
+      if (e.endPoint != null) {
+        addMarker(
+            marker: MyMarker(
+          point: e.endPoint!,
+          type: MyMarkerType.point,
+          item: e.endPoint,
+        ));
+      }
       if (e.key == null && e.endPoint == null) return;
       var list = decodePolyline(e.encodedPolyLine).unpackPolyline();
-      state.polyLines[e.key ?? e.endPoint.hashCode] = list;
+      state.polyLines[e.key ?? e.endPoint.hashCode] = Pair(list, e.color ?? Colors.black);
     }
     if (update) emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
   }
@@ -239,6 +251,20 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     if (endPoint == null && key == null) return;
     state.polyLines.remove(key ?? endPoint.hashCode);
     emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
+  }
+
+  void addAllPoints({required List<TripPoint> points}) {
+    state.markers.clear();
+    addMarkers(
+        marker: points.mapIndexed(
+      (i, e) {
+        return MyMarker(point: e.getLatLng, type: MyMarkerType.point, key: e.id, item: e);
+      },
+    ).toList());
+  }
+
+  void updateMarkersWithZoom(double zoom) {
+    emit(state.copyWith(markerNotifier: state.markerNotifier + 1, mapZoom: zoom));
   }
 }
 
