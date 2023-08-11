@@ -76,9 +76,7 @@ class MyMarker {
           width: 150.0.spMin,
           builder: (context) {
             return InkWell(
-              onTap: onTapMarker == null
-                  ? null
-                  : () => onTapMarker.call(this),
+              onTap: onTapMarker == null ? null : () => onTapMarker.call(this),
               child: Column(
                 children: [
                   const ImageMultiType(
@@ -169,7 +167,7 @@ class MyMarker {
 }
 
 class MyPolyLine {
-  LatLng? endPoint;
+  TripPoint? endPoint;
   num? key;
   String encodedPolyLine;
   Color? color;
