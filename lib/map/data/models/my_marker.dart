@@ -36,7 +36,7 @@ class MyMarker {
   double? bearing;
   MyMarkerType type;
   dynamic item;
-  Function(dynamic item)? onTapMarker;
+  Function(dynamic item)? onTapMarker1;
 
   ///Number of users pickup
   int nou;
@@ -47,7 +47,7 @@ class MyMarker {
     this.bearing,
     this.item,
     this.nou = 0,
-    this.onTapMarker,
+    this.onTapMarker1,
     this.type = MyMarkerType.location,
   });
 
@@ -156,7 +156,7 @@ class MyMarker {
             if (item is Ime) imei = item as Ime;
 
             return InkWell(
-              onTap: () => onTapMarker?.call(item),
+              onTap: () => onTapMarker1?.call(item),
               child: Column(
                 children: [
                   Transform.rotate(
