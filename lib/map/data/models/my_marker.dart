@@ -1,5 +1,6 @@
 import 'package:drawable_text/drawable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +11,8 @@ import 'package:qareeb_models/global.dart';
 import 'package:qareeb_models/points/data/model/trip_point.dart';
 
 import '../../../generated/assets.dart';
+import '../../bloc/map_controller_cubit/map_controller_cubit.dart';
+import '../response/ather_response.dart';
 
 extension IconPoint on num {
   String get iconPoint {
@@ -144,15 +147,68 @@ class MyMarker {
       case MyMarkerType.bus:
         return Marker(
           point: point,
-          height: 40.0.r,
-          width: 40.0.r,
+          height: 150.0.spMin,
+          width: 150.0.spMin,
           builder: (context) {
-            return Transform.rotate(
-              angle: bearing ?? 0.0,
-              child: ImageMultiType(
-                url: Assets.iconsLocator,
-                height: 40.0.r,
-                width: 40.0.r,
+            Ime? imei;
+            if (item is Ime) imei = item as Ime;
+
+            return InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black.withOpacity(0.3),
+                  builder: (context) {
+                    return Container(
+                      padding: EdgeInsets.all(20.0.r),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              size: 25.r,
+                              Icons.cancel_outlined,
+                            ),
+                          ),
+                          DrawableText(
+                            text: 'اسم: ${imei?.name}',
+                            color: Colors.black,
+                            matchParent: true,
+                            size: 16.0.sp,
+                          ),
+                          DrawableText(
+                            text: 'السرعة: ${imei?.speed}',
+                            color: Colors.black,
+                            matchParent: true,
+                            size: 16.0.sp,
+                          ),
+                          DrawableText(
+                            text: 'معرف الباص: ${imei?.ime}',
+                            color: Colors.black,
+                            matchParent: true,
+                            size: 16.0.sp,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              child: Column(
+                children: [
+                  Transform.rotate(
+                    angle: bearing ?? 0.0,
+                    child: ImageMultiType(
+                      url: Assets.iconsLocator,
+                      height: 40.0.spMin,
+                      width: 40.0.spMin,
+                      color: imei?.speed == '0' ? Colors.red : const Color(0xFF4CA243),
+                    ),
+                  ),
+                ],
               ),
             );
           },
