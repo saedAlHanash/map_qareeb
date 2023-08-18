@@ -89,10 +89,15 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     ));
   }
 
-  void addMarkers({required List<MyMarker> marker, bool update = true}) {
+  void addMarkers({
+    required List<MyMarker> marker,
+    bool update = true,
+    bool centerZoom = true,
+  }) {
     for (var e in marker) {
       state.markers[e.key ?? e.point.hashCode] = e;
     }
+    if (centerZoom) centerPointMarkers();
     if (update) emit(state.copyWith(markerNotifier: state.markerNotifier + 1));
   }
 
@@ -111,7 +116,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     clearMap(false);
     addMarkers(marker: path.getMarkers(), update: false);
     addEncodedPolyLines(myPolyLines: path.getPolyLines(), update: false);
-    _centerPointMarkers();
+    centerPointMarkers();
     emit(state.copyWith(
       markerNotifier: state.markerNotifier + 1,
       polylineNotifier: state.polylineNotifier + 1,
@@ -120,7 +125,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
 
   void addTrip({required TripResult trip}) {
     addMarkers(marker: trip.getMarkers());
-    _centerPointMarkers();
+    centerPointMarkers();
 
     addPolyLine(start: trip.startPoint, end: trip.endPoint);
     emit(state.copyWith(
@@ -144,7 +149,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     );
 
     if (trip.canConfirm) {
-      _centerPointMarkers();
+      centerPointMarkers();
       addPolyLine(start: trip.startLocation, end: trip.endLocation);
     }
 
@@ -154,7 +159,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     ));
   }
 
-  void _centerPointMarkers() {
+  void centerPointMarkers() {
     state.centerZoomPoints.clear();
 
     for (var e in state.markers.values) {

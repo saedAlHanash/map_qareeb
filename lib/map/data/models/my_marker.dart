@@ -36,6 +36,7 @@ class MyMarker {
   double? bearing;
   MyMarkerType type;
   dynamic item;
+  Function(dynamic item)? onTapMarker;
 
   ///Number of users pickup
   int nou;
@@ -154,49 +155,7 @@ class MyMarker {
             if (item is Ime) imei = item as Ime;
 
             return InkWell(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  barrierColor: Colors.black.withOpacity(0.3),
-                  builder: (context) {
-                    return Container(
-                      padding: EdgeInsets.all(20.0.r),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Icon(
-                              size: 25.r,
-                              Icons.cancel_outlined,
-                            ),
-                          ),
-                          DrawableText(
-                            text: 'اسم: ${imei?.name}',
-                            color: Colors.black,
-                            matchParent: true,
-                            size: 16.0.sp,
-                          ),
-                          DrawableText(
-                            text: 'السرعة: ${imei?.speed}',
-                            color: Colors.black,
-                            matchParent: true,
-                            size: 16.0.sp,
-                          ),
-                          DrawableText(
-                            text: 'معرف الباص: ${imei?.ime}',
-                            color: Colors.black,
-                            matchParent: true,
-                            size: 16.0.sp,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
+              onTap: () => onTapMarker?.call(item),
               child: Column(
                 children: [
                   Transform.rotate(
