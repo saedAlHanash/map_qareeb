@@ -28,6 +28,7 @@ class MapWidget extends StatefulWidget {
     this.updateMarkerWithZoom,
     this.onMapClick,
     this.onTapMarker,
+    this.atherMarker,
   }) : super(key: key);
 
   final Function(MapController controller)? onMapReady;
@@ -36,10 +37,12 @@ class MapWidget extends StatefulWidget {
   final Function(MyMarker marker)? onTapMarker;
   final LatLng? initialPoint;
   final bool? updateMarkerWithZoom;
+  final Marker? atherMarker;
 
-  static initImeis(List<String> imei) => imeis
-    ..clear()
-    ..addAll(imei);
+  static initImeis(List<String> imei) =>
+      imeis
+        ..clear()
+        ..addAll(imei);
 
   GlobalKey<MapWidgetState> getKey() {
     return GlobalKey<MapWidgetState>();
@@ -142,11 +145,11 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           onTap: widget.onMapClick == null
               ? null
               : (tapPosition, point) {
-                  mapControllerCubit.addSingleMarker(
-                    marker: MyMarker(point: point),
-                  );
-                  widget.onMapClick!.call(point);
-                },
+            mapControllerCubit.addSingleMarker(
+              marker: MyMarker(point: point),
+            );
+            widget.onMapClick!.call(point);
+          },
           zoom: 12.0,
         ),
         nonRotatedChildren: [
@@ -207,7 +210,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                       MyAnimatedMarkerLayer(
                         options: AnimatedMarkerLayerOptions(
                           duration: const Duration(seconds: 15),
-                          marker: Marker(
+                          marker: widget.atherMarker ?? Marker(
                             width: 75.0.spMin,
                             height: 75.0.spMin,
                             point: e.getLatLng(),
@@ -275,16 +278,16 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     return state.markers.values
         .mapIndexed(
           (i, e) {
-            return e.getWidget(i,onTapMarker: widget.onTapMarker);
-          },
-        )
+        return e.getWidget(i, onTapMarker: widget.onTapMarker);
+      },
+    )
         .take(state.mapZoom.getZoomMarkerCount)
         .toList();
   }
 
   List<Polyline> initPolyline(MapControllerInitial state) {
     return state.polyLines.values.mapIndexed(
-      (i, e) {
+          (i, e) {
         return Polyline(
           points: e.first,
           color: e.second,
@@ -315,7 +318,10 @@ class MapTypeSpinner extends StatelessWidget {
       top: 30.0.h,
       right: 10.0.w,
       child: PopupMenuButton<MapType>(
-        initialValue: context.read<MapControlCubit>().state.type,
+        initialValue: context
+            .read<MapControlCubit>()
+            .state
+            .type,
         onSelected: (MapType item) {
           context.read<MapControlCubit>().changeMapType(item, controller.center);
         },
