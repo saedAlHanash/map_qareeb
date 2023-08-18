@@ -112,7 +112,6 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         ),
         BlocListener<MapControllerCubit, MapControllerInitial>(
           listener: (context, state) async {
-            loggerObject.wtf(state.centerZoomPoints);
             if (state.point != null) {
               controller.animateTo(dest: state.point!, zoom: state.zoom);
             }

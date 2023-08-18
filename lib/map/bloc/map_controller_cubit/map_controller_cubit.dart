@@ -102,7 +102,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   }
 
   void clearMap(bool update) {
-    state.markers.clear();
+    state.markers.removeWhere((key, value) => key != _singleMarkerKey);
     state.polyLines.clear();
     if (update) {
       emit(state.copyWith(
@@ -160,6 +160,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   }
 
   void centerPointMarkers() {
+
     state.centerZoomPoints.clear();
 
     for (var e in state.markers.values) {
