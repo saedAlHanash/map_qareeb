@@ -97,8 +97,12 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     for (var e in marker) {
       state.markers[e.key ?? e.point.hashCode] = e;
     }
+    if (centerZoom) {
+      centerPointMarkers();
+    } else {
+      state.centerZoomPoints.clear();
+    }
     if (update) emit(state.copyWith(markerNotifier: state.markerNotifier + 1));
-    if (centerZoom) centerPointMarkers();
   }
 
   void clearMap(bool update) {
@@ -160,7 +164,6 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   }
 
   void centerPointMarkers() {
-
     state.centerZoomPoints.clear();
 
     for (var e in state.markers.values) {
