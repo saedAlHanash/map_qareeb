@@ -47,6 +47,7 @@ class MyMarker {
     this.bearing,
     this.item,
     this.nou = 0,
+    this.onTapMarker,
     this.type = MyMarkerType.location,
   });
 

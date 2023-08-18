@@ -92,7 +92,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   void addMarkers({
     required List<MyMarker> marker,
     bool update = true,
-    bool centerZoom = true,
+    bool centerZoom = false,
   }) {
     for (var e in marker) {
       state.markers[e.key ?? e.point.hashCode] = e;
