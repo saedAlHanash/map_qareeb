@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:qareeb_models/global.dart';
 import 'package:saed_http/api_manager/api_service.dart';
+import 'package:saed_http/api_manager/server_proxy/server_proxy_request.dart';
 import 'package:saed_http/api_manager/server_proxy/server_proxy_service.dart';
 import 'package:saed_http/pair_class.dart';
 
@@ -21,9 +24,12 @@ class SearchLocationCubit extends Cubit<SearchLocationInitial> {
       emit(state.copyWith(statuses: CubitStatuses.done, result: []));
       return;
     }
-    request = 'دمشق $request'.removeDuplicates;
+    request = 'دمشق $request';
+
+    loggerObject.v(request);
 
     emit(state.copyWith(statuses: CubitStatuses.loading, request: request));
+
     final pair = await _searchLocationApi();
 
     if (pair.first != null) {
@@ -34,24 +40,27 @@ class SearchLocationCubit extends Cubit<SearchLocationInitial> {
   }
 
   Future<Pair<List<SearchLocationResult>?, String?>> _searchLocationApi() async {
+    final pair = await getServerProxyApi(
+      request: ApiServerRequest(
+        url: APIService().getUri(
+          url: 'search.php',
+          hostName: 'nominatim.openstreetmap.org',
+          query: {
+            'q': state.request,
+            'format': 'jsonv2',
+            'countrycodes': 'sy',
+            'accept-language': 'ar',
+          },
+        ).toString(),
+        headers: {"Accept": "application/json", "User-Agent": "android"},
+        method: 'Get',
+      ),
+    );
 
-      final response = await APIService().getApi(
-        url: 'search.php',
-        hostName: 'nominatim.openstreetmap.org',
-        query: {
-          'q': state.request,
-          'dedupe': 0,
-          // 'accept-language': 'ar',
-          // 'countrycodes': 'sy',
-          'format': 'jsonv2'
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return Pair(SearchLocationResponse.fromJson(response.json).result, null);
-      } else {
-        return Pair(null, ErrorManager.getApiError(response));
-      }
-
+    if (pair.first != null) {
+      return Pair(SearchLocationResponse.fromJson(jsonDecode(pair.first)).result, null);
+    } else {
+      return Pair(null, 'Error Map Server  code: ${pair.second}');
+    }
   }
 }
