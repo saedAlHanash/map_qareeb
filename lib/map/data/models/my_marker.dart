@@ -16,7 +16,8 @@ import '../response/ather_response.dart';
 
 extension IconPoint on num {
   String get iconPoint {
-    switch (toInt()) {
+    final data = toInt() - 1;
+    switch (data) {
       case 1:
         return Assets.icons1;
       case 2:
