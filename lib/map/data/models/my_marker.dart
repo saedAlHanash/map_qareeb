@@ -17,16 +17,60 @@ import '../response/ather_response.dart';
 extension IconPoint on num {
   String get iconPoint {
     switch (toInt()) {
-      case 0:
-        return Assets.iconsA;
       case 1:
-        return Assets.iconsB;
+        return Assets.icons1;
       case 2:
-        return Assets.iconsC;
+        return Assets.icons2;
       case 3:
-        return Assets.iconsD;
+        return Assets.icons3;
+      case 4:
+        return Assets.icons4;
+      case 5:
+        return Assets.icons5;
+      case 6:
+        return Assets.icons6;
+      case 7:
+        return Assets.icons7;
+      case 8:
+        return Assets.icons8;
+      case 9:
+        return Assets.icons9;
+      case 10:
+        return Assets.icons10;
+      case 11:
+        return Assets.icons11;
+      case 12:
+        return Assets.icons12;
+      case 13:
+        return Assets.icons13;
+      case 14:
+        return Assets.icons14;
+      case 15:
+        return Assets.icons15;
+      case 16:
+        return Assets.icons16;
+      case 17:
+        return Assets.icons17;
+      case 18:
+        return Assets.icons18;
+      case 19:
+        return Assets.icons19;
+      case 20:
+        return Assets.icons20;
+      case 21:
+        return Assets.icons21;
+      case 22:
+        return Assets.icons22;
+      case 23:
+        return Assets.icons23;
+      case 24:
+        return Assets.icons24;
+      case 25:
+        return Assets.icons25;
+      case 26:
+        return Assets.icons26;
     }
-    return Assets.iconsE;
+    return Assets.icons26;
   }
 }
 
@@ -39,14 +83,14 @@ class MyMarker {
   Function(dynamic item)? onTapMarker1;
 
   ///Number of users pickup
-  int nou;
+  String nou;
 
   MyMarker({
     required this.point,
     this.key,
     this.bearing,
     this.item,
-    this.nou = 0,
+    this.nou = '',
     this.onTapMarker1,
     this.type = MyMarkerType.location,
   });
@@ -59,20 +103,12 @@ class MyMarker {
           height: 40.0.r,
           width: 40.0.r,
           builder: (context) {
-            return Transform.rotate(
-              angle: bearing ?? 0.0,
-              child: ImageMultiType(
-                url: Assets.iconsMainColorMarker,
-                height: 40.0.r,
-                width: 40.0.r,
-              ),
+            return ImageMultiType(
+              url: Assets.iconsMainColorMarker,
+              height: 40.0.r,
+              width: 40.0.r,
             );
           },
-        );
-      case MyMarkerType.driver:
-        return Marker(
-          point: point,
-          builder: (context) => 0.0.verticalSpace,
         );
       case MyMarkerType.point:
         return Marker(
@@ -117,35 +153,38 @@ class MyMarker {
           width: 50.0.r,
           builder: (context) {
             return Builder(builder: (context) {
-              var nou = 0;
-              return Column(
-                children: [
-                  if (nou != 0)
-                    Container(
-                      height: 35.0.r,
-                      width: 70.0.r,
-                      margin: EdgeInsets.only(bottom: 5.0.r),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5.0.r),
+              return InkWell(
+                onTap: onTapMarker1 == null ? null : () => onTapMarker1?.call(item),
+                child: Column(
+                  children: [
+                    if (nou.isNotEmpty)
+                      Container(
+                        height: 35.0.r,
+                        width: 70.0.r,
+                        margin: EdgeInsets.only(bottom: 5.0.r),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5.0.r),
+                        ),
+                        alignment: Alignment.center,
+                        child: DrawableText(
+                          text: '$nou مقعد',
+                          color: Colors.black,
+                          size: 12.0.sp,
+                        ),
                       ),
-                      alignment: Alignment.center,
-                      child: DrawableText(
-                        text: '$nou مقعد',
-                        color: Colors.black,
-                        size: 12.0.sp,
-                      ),
+                    ImageMultiType(
+                      url: index.iconPoint,
+                      height: 50.0.r,
+                      width: 50.0.r,
                     ),
-                  ImageMultiType(
-                    url: index.iconPoint,
-                    height: 50.0.r,
-                    width: 50.0.r,
-                  ),
-                ],
+                  ],
+                ),
               );
             });
           },
         );
+      case MyMarkerType.driver:
       case MyMarkerType.bus:
         return Marker(
           point: point,
@@ -156,7 +195,7 @@ class MyMarker {
             if (item is Ime) imei = item as Ime;
 
             return InkWell(
-              onTap: () => onTapMarker1?.call(item),
+              onTap: onTapMarker1 == null ? null : () => onTapMarker1?.call(item),
               child: Column(
                 children: [
                   Transform.rotate(
