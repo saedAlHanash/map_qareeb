@@ -202,10 +202,9 @@ class MyMarker {
                   Transform.rotate(
                     angle: bearing ?? 0.0,
                     child: ImageMultiType(
-                      url: Assets.iconsLocator,
+                      url: Assets.iconsCarTopView,
                       height: 40.0.spMin,
                       width: 40.0.spMin,
-                      color: imei?.speed == '0' ? Colors.red : const Color(0xFF4CA243),
                     ),
                   ),
                 ],

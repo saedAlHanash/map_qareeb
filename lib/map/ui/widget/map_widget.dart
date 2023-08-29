@@ -216,13 +216,10 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
                             point: e.getLatLng(),
                             builder: (_) {
                               return Center(
-                                child: Transform.rotate(
-                                  angle: -e.angle,
-                                  child: ImageMultiType(
-                                    url: Assets.iconsCarTopView,
-                                    height: 200.0.spMin,
-                                    width: 200.0.spMin,
-                                  ),
+                                child: ImageMultiType(
+                                  url: Assets.iconsCarTopView,
+                                  height: 200.0.spMin,
+                                  width: 200.0.spMin,
                                 ),
                               );
                             },
