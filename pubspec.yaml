@@ -30,18 +30,17 @@ dependencies:
       url: https://github.com/saedAlHanash/qareeb_models
 
 
-
+  google_maps_flutter: ^2.5.0
   flutter_bloc: any
   #  dartz: ^0.10.1
   equatable: ^2.0.5
   get_it: any
   internet_connection_checker: ^1.0.0+1
   http: any
-  latlong2: any
   flutter_map: ^4.0.0
   logger: ^1.1.0
   flutter_map_animations: ^0.3.0
-  dropdown_button2: ^1.9.2
+#  dropdown_button2: ^2.3.9
   geolocator: any
   collection: any
   flutter_screenutil: any

@@ -6,7 +6,7 @@
 // import 'package:flutter_qareeb_client/features/booking/bloc/booking_ui_control_cubit/booking_ui_control_cubit.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:flutter_svg/svg.dart';
-// import 'package:latlong2/latlong.dart';
+// 
 //
 // import '../../../../core/strings/app_color_manager.dart';
 // import '../../../../core/strings/enum_manager.dart';
@@ -314,7 +314,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_map/flutter_map.dart';
 // import 'package:flutter_map_animated_marker/flutter_map_animated_marker.dart';
-// import 'package:latlong2/latlong.dart';
+// 
 // import 'package:rxdart/subjects.dart';
 //
 // import '../../../../generated/assets.dart';

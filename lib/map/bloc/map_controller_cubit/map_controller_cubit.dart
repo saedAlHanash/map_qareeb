@@ -5,9 +5,10 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
-import 'package:latlong2/latlong.dart';
+
 import 'package:qareeb_models/booking/trip_mediator.dart';
 import 'package:qareeb_models/extensions.dart';
 import 'package:qareeb_models/global.dart';

@@ -1,18 +1,61 @@
+import 'dart:typed_data';
+
 import 'package:drawable_text/drawable_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_multi_type/image_multi_type.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as google_map;
 
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' as ll;
 import 'package:qareeb_models/global.dart';
 import 'package:qareeb_models/points/data/model/trip_point.dart';
 
 import '../../../generated/assets.dart';
-import '../../bloc/map_controller_cubit/map_controller_cubit.dart';
+
 import '../response/ather_response.dart';
+import 'dart:ui' as ui;
+
+Future<Uint8List> getBytesFromCanvas(int width, int height) async {
+  final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+  final Canvas canvas = Canvas(pictureRecorder);
+  final Paint paint = Paint()..color = Colors.blue;
+  const Radius radius = Radius.circular(20.0);
+  canvas.drawRRect(
+      RRect.fromRectAndCorners(
+        Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
+        topLeft: radius,
+        topRight: radius,
+        bottomLeft: radius,
+        bottomRight: radius,
+      ),
+      paint);
+  TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
+  painter.text = const TextSpan(
+    text: 'Hello world',
+    style: TextStyle(fontSize: 25.0, color: Colors.white),
+  );
+  painter.layout();
+  painter.paint(canvas,
+      Offset((width * 0.5) - painter.width * 0.5, (height * 0.5) - painter.height * 0.5));
+  final img = await pictureRecorder.endRecording().toImage(width, height);
+  final data = await img.toByteData(format: ui.ImageByteFormat.png);
+  return data?.buffer.asUint8List() ?? Uint8List(0);
+}
+
+Future<Uint8List> getBytesFromAsset(String path, num width) async {
+  final data = await rootBundle.load(path);
+  ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+      targetWidth: width.toInt());
+  ui.FrameInfo fi = await codec.getNextFrame();
+  return (await fi.image.toByteData(format: ui.ImageByteFormat.png))
+          ?.buffer
+          .asUint8List() ??
+      Uint8List(0);
+}
 
 extension IconPoint on num {
   String get iconPoint {
@@ -76,7 +119,7 @@ extension IconPoint on num {
 }
 
 class MyMarker {
-  LatLng point;
+  google_map.LatLng point;
   num? key;
   double? bearing;
   MyMarkerType type;
@@ -100,7 +143,7 @@ class MyMarker {
     switch (type) {
       case MyMarkerType.location:
         return Marker(
-          point: point,
+          point: ll.LatLng(point.latitude, point.longitude),
           height: 40.0.r,
           width: 40.0.r,
           builder: (context) {
@@ -113,7 +156,7 @@ class MyMarker {
         );
       case MyMarkerType.point:
         return Marker(
-          point: point,
+          point: ll.LatLng(point.latitude, point.longitude),
           height: 90.0.spMin,
           width: 150.0.spMin,
           builder: (context) {
@@ -149,7 +192,7 @@ class MyMarker {
         );
       case MyMarkerType.sharedPint:
         return Marker(
-          point: point,
+          point: ll.LatLng(point.latitude, point.longitude),
           height: 50.0.r,
           width: 50.0.r,
           builder: (context) {
@@ -188,7 +231,7 @@ class MyMarker {
       case MyMarkerType.driver:
       case MyMarkerType.bus:
         return Marker(
-          point: point,
+          point: ll.LatLng(point.latitude, point.longitude),
           height: 150.0.spMin,
           width: 150.0.spMin,
           builder: (context) {
@@ -211,6 +254,30 @@ class MyMarker {
               ),
             );
           },
+        );
+    }
+  }
+
+  Future<google_map.Marker> getWidgetGoogleMap(
+      {required int index,
+      required num key,
+      Function(MyMarker marker)? onTapMarker}) async {
+    switch (type) {
+      case MyMarkerType.location:
+        return google_map.Marker(
+          markerId: google_map.MarkerId(key.toString()),
+          position: point,
+          icon: google_map.BitmapDescriptor.fromBytes(
+            await getBytesFromAsset(Assets.iconsMainColorMarker, 40.0.r),
+          ),
+        );
+      default:
+        return google_map.Marker(
+          markerId: google_map.MarkerId(key.toString()),
+          position: point,
+          icon: google_map.BitmapDescriptor.fromBytes(
+            await getBytesFromAsset(Assets.iconsMainColorMarker, 40.0.r),
+          ),
         );
     }
   }

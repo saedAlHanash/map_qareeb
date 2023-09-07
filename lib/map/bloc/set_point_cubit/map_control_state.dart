@@ -7,7 +7,7 @@ class MapControlInitial {
   final bool moveCamera;
   final double bearing;
 
-  final MapType type;
+  final MyMapType type;
 
   const MapControlInitial({
     required this.oldPoint,
@@ -19,11 +19,11 @@ class MapControlInitial {
   });
 
   factory MapControlInitial.initial() {
-    return MapControlInitial(
-      point: LatLng( 0,  0),
-      oldPoint: LatLng( 0,  0),
+    return const MapControlInitial(
+      point: LatLng(0, 0),
+      oldPoint: LatLng(0, 0),
       bearing: 0.0,
-      type: MapType.normal,
+      type: MyMapType.normal,
       state: '',
       moveCamera: true,
     );
@@ -37,7 +37,7 @@ class MapControlInitial {
     String? state,
     bool? moveCamera,
     double? bearing,
-    MapType? type,
+    MyMapType? type,
   }) =>
       MapControlInitial(
         point: point ?? this.point,

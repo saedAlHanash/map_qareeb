@@ -7,8 +7,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
+
+import 'package:latlong2/latlong.dart' as ll;
 import 'package:image_multi_type/image_multi_type.dart';
-import 'package:latlong2/latlong.dart';
+
 import 'package:qareeb_models/global.dart';
 import 'package:saed_http/api_manager/api_service.dart';
 
@@ -28,14 +31,14 @@ class MapWidget extends StatefulWidget {
     this.updateMarkerWithZoom,
     this.onMapClick,
     this.onTapMarker,
-    this.atherListener= true,
+    this.atherListener = true,
   }) : super(key: key);
 
   final Function(MapController controller)? onMapReady;
-  final Function(LatLng latLng)? onMapClick;
+  final Function(google.LatLng latLng)? onMapClick;
   final Function()? search;
   final Function(MyMarker marker)? onTapMarker;
-  final LatLng? initialPoint;
+  final google.LatLng? initialPoint;
   final bool? updateMarkerWithZoom;
   final bool atherListener;
 
@@ -63,22 +66,22 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
   controlMarkersListener(_, MapControlInitial state) async {
     if (state.moveCamera) {
-      controller.animateTo(dest: state.point, zoom: controller.zoom);
+      controller.animateTo(dest: state.point.ll2, zoom: controller.zoom);
     }
 
     if (state.state == 'mt') {
       switch (state.type) {
-        case MapType.normal:
+        case MyMapType.normal:
           tile = 'https://maps.almobtakiroon.com/osm/tile/{z}/{x}/{y}.png';
           maxZoom = 18.0;
           break;
 
-        case MapType.word:
+        case MyMapType.word:
           tile = 'https://maps.almobtakiroon.com/world2/tiles/{z}/{x}/{y}.png';
           maxZoom = 16.4;
           break;
 
-        case MapType.mix:
+        case MyMapType.mix:
           tile = 'https://maps.almobtakiroon.com/overlay/{z}/{x}/{y}.png';
           maxZoom = 16.4;
           break;
@@ -107,18 +110,19 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         ),
         BlocListener<AtherCubit, AtherInitial>(
           listener: (context, state) {
-            // controller.move(state.result.getLatLng(), controller.zoom);
+            // controller.move(state.result.getgoogle.LatLng(), controller.zoom);
           },
         ),
         BlocListener<MapControllerCubit, MapControllerInitial>(
           listener: (context, state) async {
             loggerObject.wtf(state.centerZoomPoints);
             if (state.point != null) {
-              controller.animateTo(dest: state.point!, zoom: state.zoom);
+              controller.animateTo(dest: state.point!.ll2, zoom: state.zoom);
             }
 
             if (state.centerZoomPoints.isNotEmpty) {
-              await controller.centerOnPoints(state.centerZoomPoints,
+              await controller.centerOnPoints(
+                  state.centerZoomPoints.map((e) => e.ll2).toList(),
                   options: const FitBoundsOptions(
                     forceIntegerZoomLevel: true,
                   ));
@@ -131,7 +135,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         mapController: controller,
         options: MapOptions(
           maxZoom: maxZoom,
-          center: widget.initialPoint ?? initialPoint,
+          center: widget.initialPoint?.ll2 ?? initialPoint.ll2,
           onPositionChanged: (position, hasGesture) {
             // Fill your stream when your position changes
             final zoom = position.zoom;
@@ -145,9 +149,9 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               ? null
               : (tapPosition, point) {
                   mapControllerCubit.addSingleMarker(
-                    marker: MyMarker(point: point),
+                    marker: MyMarker(point: point.gll),
                   );
-                  widget.onMapClick!.call(point);
+                  widget.onMapClick!.call(point.gll);
                 },
           zoom: 12.0,
         ),
@@ -198,39 +202,39 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               );
             },
           ),
-          if(widget.atherListener)
-          BlocBuilder<AtherCubit, AtherInitial>(
-            builder: (context, state) {
-              return SizedBox(
-                height: double.infinity,
-                width: double.infinity,
-                child: Stack(
-                  children: [
-                    for (var e in state.result)
-                      MyAnimatedMarkerLayer(
-                        options: AnimatedMarkerLayerOptions(
-                          duration: const Duration(seconds: 15),
-                          marker: Marker(
-                            width: 75.0.spMin,
-                            height: 75.0.spMin,
-                            point: e.getLatLng(),
-                            builder: (_) {
-                              return Center(
-                                child: ImageMultiType(
-                                  url: Assets.iconsCarTopView,
-                                  height: 200.0.spMin,
-                                  width: 200.0.spMin,
-                                ),
-                              );
-                            },
+          if (widget.atherListener)
+            BlocBuilder<AtherCubit, AtherInitial>(
+              builder: (context, state) {
+                return SizedBox(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: Stack(
+                    children: [
+                      for (var e in state.result)
+                        MyAnimatedMarkerLayer(
+                          options: AnimatedMarkerLayerOptions(
+                            duration: const Duration(seconds: 15),
+                            marker: Marker(
+                              width: 75.0.spMin,
+                              height: 75.0.spMin,
+                              point: e.getLatLng().ll2,
+                              builder: (_) {
+                                return Center(
+                                  child: ImageMultiType(
+                                    url: Assets.iconsCarTopView,
+                                    height: 200.0.spMin,
+                                    width: 200.0.spMin,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
+                    ],
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
@@ -286,7 +290,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     return state.polyLines.values.mapIndexed(
       (i, e) {
         return Polyline(
-          points: e.first,
+          points: e.first.map((e) => e.ll2).toList(),
           color: e.second,
           strokeCap: StrokeCap.round,
           strokeWidth: 5.0.spMin,
@@ -299,9 +303,9 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 //---------------------------------------
 
 final mapTypeList = [
-  SpinnerItem(name: 'خريطة عادية', id: MapType.normal.index),
-  SpinnerItem(name: 'قمر صناعي', id: MapType.word.index),
-  SpinnerItem(name: 'مختلطة', id: MapType.mix.index),
+  SpinnerItem(name: 'خريطة عادية', id: MyMapType.normal.index),
+  SpinnerItem(name: 'قمر صناعي', id: MyMapType.word.index),
+  SpinnerItem(name: 'مختلطة', id: MyMapType.mix.index),
 ];
 
 class MapTypeSpinner extends StatelessWidget {
@@ -314,10 +318,10 @@ class MapTypeSpinner extends StatelessWidget {
     return Positioned(
       top: 30.0.h,
       right: 10.0.w,
-      child: PopupMenuButton<MapType>(
+      child: PopupMenuButton<MyMapType>(
         initialValue: context.read<MapControlCubit>().state.type,
-        onSelected: (MapType item) {
-          context.read<MapControlCubit>().changeMapType(item, controller.center);
+        onSelected: (MyMapType item) {
+          context.read<MapControlCubit>().changeMapType(item, controller.center.gll);
         },
         child: const Card(
           elevation: 3.0,
@@ -328,17 +332,17 @@ class MapTypeSpinner extends StatelessWidget {
           ),
         ),
         itemBuilder: (BuildContext context) {
-          return <PopupMenuEntry<MapType>>[
-            const PopupMenuItem<MapType>(
-              value: MapType.normal,
+          return <PopupMenuEntry<MyMapType>>[
+            const PopupMenuItem<MyMapType>(
+              value: MyMapType.normal,
               child: Text('خريطة عادية'),
             ),
-            const PopupMenuItem<MapType>(
-              value: MapType.word,
+            const PopupMenuItem<MyMapType>(
+              value: MyMapType.word,
               child: Text('قمر صناعي'),
             ),
-            const PopupMenuItem<MapType>(
-              value: MapType.mix,
+            const PopupMenuItem<MyMapType>(
+              value: MyMapType.mix,
               child: Text('مختلطة'),
             ),
           ];
@@ -357,7 +361,7 @@ class MapTypeSpinner extends StatelessWidget {
       //   onChanged: (p0) {
       //     context
       //         .read<MapControlCubit>()
-      //         .changeMapType(MapType.values[p0.id], controller.center);
+      //         .changeMyMapType(MyMapType.values[p0.id], controller.center);
       //   },
       // ),
     );
@@ -376,9 +380,17 @@ extension DoubleHealper on double {
   }
 }
 
+extension LatLngHealper on google.LatLng {
+  ll.LatLng get ll2 => ll.LatLng(latitude, longitude);
+}
+
+extension GLatLngHealper on ll.LatLng {
+  google.LatLng get gll => google.LatLng(latitude, longitude);
+}
+
 final List<String> imeis = [];
 
-final initialPoint = LatLng(33.514631885313264, 36.27654397981723);
+const initialPoint = google.LatLng(33.514631885313264, 36.27654397981723);
 
 class CachedTileProvider extends TileProvider {
   @override

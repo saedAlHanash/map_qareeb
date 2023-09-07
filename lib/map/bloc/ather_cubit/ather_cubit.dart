@@ -3,7 +3,8 @@ import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import 'package:qareeb_models/extensions.dart';
 import 'package:saed_http/api_manager/api_service.dart';
 import 'package:saed_http/api_manager/server_proxy/server_proxy_request.dart';

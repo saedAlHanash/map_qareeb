@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:qareeb_models/global.dart';
-
 
 part 'map_control_state.dart';
 
@@ -12,7 +11,7 @@ class MapControlCubit extends Cubit<MapControlInitial> {
     emit(state.copyWith(point: point, moveCamera: true, state: ''));
   }
 
-  void changeMapType(MapType type, LatLng point) {
+  void changeMapType(MyMapType type, LatLng point) {
     emit(state.copyWith(
       type: type,
       state: 'mt',
