@@ -36,7 +36,7 @@ class AtherCubit extends Cubit<AtherInitial> {
 
   Future<Pair<List<Ime>?, String?>> _getDriverLocationApi(List<String> ime) async {
     // var ime = '359632104211708';
-    APIService().innerHeader.addAll({'X-Frame-Options': 'SAMEORIGIN'});
+      APIService().innerHeader.addAll({'X-Frame-Options': 'SAMEORIGIN'});
     APIService().initBaseUrl(baseUrl: 'live.qareeb-maas.com');
     final pair = await getServerProxyApi(
       request: ApiServerRequest(

@@ -171,14 +171,12 @@ class MyMarker {
                     color: Colors.black,
                   ),
                   if (item is TripPoint)
-                    Container(
+                    SizedBox(
                       width: 150.0.spMin,
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(3.0).r,
                       child: DrawableText(
                         selectable: false,
                         text: (item as TripPoint).arName,
-                        size: 15.0.sp,
+                        size: 16.0.sp,
                         maxLines: 2,
                         fontFamily: FontManager.cairoBold,
                         matchParent: true,

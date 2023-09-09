@@ -60,7 +60,13 @@ class GMapWidgetState extends State<GMapWidget> with TickerProviderStateMixin {
           listener: (context, state) {},
         ),
         BlocListener<MapControllerCubit, MapControllerInitial>(
-          listener: (context, state) async {},
+          listener: (context, state) {
+            initMarker(state).then((value) {
+              setState(() => markers
+                ..clear()
+                ..addAll(value));
+            });
+          },
         ),
       ],
       child: GoogleMap(
