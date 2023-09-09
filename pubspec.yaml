@@ -15,7 +15,7 @@ dependencies:
   drawable_text:
     git:
       url: https://github.com/saedAlHanash/drawable_text
-      ref: android
+      ref: html
 
   image_multi_type:
     git:
