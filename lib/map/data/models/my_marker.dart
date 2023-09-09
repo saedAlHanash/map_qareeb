@@ -157,7 +157,7 @@ class MyMarker {
       case MyMarkerType.point:
         return Marker(
           point: ll.LatLng(point.latitude, point.longitude),
-          height: 90.0.spMin,
+          height: 110.0.spMin,
           width: 150.0.spMin,
           builder: (context) {
             return InkWell(
