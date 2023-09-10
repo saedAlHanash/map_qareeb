@@ -26,7 +26,6 @@ class SearchLocationCubit extends Cubit<SearchLocationInitial> {
     }
     request = 'دمشق $request';
 
-    loggerObject.v(request);
 
     emit(state.copyWith(statuses: CubitStatuses.loading, request: request));
 

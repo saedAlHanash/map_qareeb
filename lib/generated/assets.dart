@@ -62,7 +62,7 @@ class Assets {
   static const String iconsD = 'assets/icons/d.svg';
   static const String iconsE = 'assets/icons/e.svg';
   static const String iconsLocator = 'assets/icons/locator.svg';
-  static const String iconsMainColorMarker = 'assets/icons/main_color_marker.svg';
+  static const String iconsMainColorMarker = 'assets/icons/main_color_marker.png';
   static const String iconsMarkerStart = 'assets/icons/marker_start.svg';
 
 }

@@ -203,7 +203,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     required LatLng end,
     int? key,
   }) async {
-    if (start == null) return;
+    if (start == null || start.latitude == 0 || end.latitude == 0) return;
 
     final pair = await _getRoutePointApi(start: start, end: end);
 

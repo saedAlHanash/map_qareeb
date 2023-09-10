@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:saed_http/api_manager/api_service.dart';
 
 import '../../bloc/ather_cubit/ather_cubit.dart';
 import '../../bloc/map_controller_cubit/map_controller_cubit.dart';
@@ -76,7 +77,14 @@ class GMapWidgetState extends State<GMapWidget> with TickerProviderStateMixin {
           zoom: 13.0,
         ),
         onMapCreated: (GoogleMapController controller) {
+
           _controller.complete(controller);
+          controller.animateCamera(
+            CameraUpdate.newCameraPosition(CameraPosition(
+              target: widget.initialPoint ?? initialPoint,
+              zoom: 13.0,
+            )),
+          );
         },
         onTap: (argument) => widget.onMapClick?.call(argument),
         markers: markers,

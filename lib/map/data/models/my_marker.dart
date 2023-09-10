@@ -1,29 +1,35 @@
-import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:drawable_text/drawable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:image_multi_type/image_multi_type.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google_map;
-
+import 'package:image_multi_type/image_multi_type.dart';
 import 'package:latlong2/latlong.dart' as ll;
 import 'package:qareeb_models/global.dart';
 import 'package:qareeb_models/points/data/model/trip_point.dart';
 
 import '../../../generated/assets.dart';
-
 import '../response/ather_response.dart';
-import 'dart:ui' as ui;
+
+Future<Uint8List> getBytesFromAsset(String path, num width) async {
+  final data = await rootBundle.load(path);
+  ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+      targetWidth: width.toInt());
+  ui.FrameInfo fi = await codec.getNextFrame();
+  final bytes =
+      (await fi.image.toByteData(format: ui.ImageByteFormat.png))?.buffer.asUint8List() ??
+          Uint8List(0);
+  return bytes;
+}
 
 Future<Uint8List> getBytesFromCanvas(int width, int height) async {
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
   final Paint paint = Paint()..color = Colors.blue;
-  const Radius radius = Radius.circular(20.0);
+  final Radius radius = Radius.circular(20.0);
   canvas.drawRRect(
       RRect.fromRectAndCorners(
         Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
@@ -34,7 +40,7 @@ Future<Uint8List> getBytesFromCanvas(int width, int height) async {
       ),
       paint);
   TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
-  painter.text = const TextSpan(
+  painter.text = TextSpan(
     text: 'Hello world',
     style: TextStyle(fontSize: 25.0, color: Colors.white),
   );
@@ -46,16 +52,6 @@ Future<Uint8List> getBytesFromCanvas(int width, int height) async {
   return data?.buffer.asUint8List() ?? Uint8List(0);
 }
 
-Future<Uint8List> getBytesFromAsset(String path, num width) async {
-  final data = await rootBundle.load(path);
-  ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-      targetWidth: width.toInt());
-  ui.FrameInfo fi = await codec.getNextFrame();
-  return (await fi.image.toByteData(format: ui.ImageByteFormat.png))
-          ?.buffer
-          .asUint8List() ??
-      Uint8List(0);
-}
 
 extension IconPoint on num {
   String get iconPoint {
@@ -176,7 +172,7 @@ class MyMarker {
                       child: DrawableText(
                         selectable: false,
                         text: (item as TripPoint).arName,
-                        size: 16.0.sp,
+                        size: 14.0.sp,
                         maxLines: 2,
                         fontFamily: FontManager.cairoBold,
                         matchParent: true,
@@ -262,20 +258,20 @@ class MyMarker {
       Function(MyMarker marker)? onTapMarker}) async {
     switch (type) {
       case MyMarkerType.location:
+        final icon = google_map.BitmapDescriptor.fromBytes(
+            await getBytesFromAsset(Assets.iconsMainColorMarker, 500.0.r));
+
         return google_map.Marker(
           markerId: google_map.MarkerId(key.toString()),
           position: point,
-          icon: google_map.BitmapDescriptor.fromBytes(
-            await getBytesFromAsset(Assets.iconsMainColorMarker, 40.0.r),
-          ),
+          icon: icon,
         );
       default:
+
         return google_map.Marker(
           markerId: google_map.MarkerId(key.toString()),
           position: point,
-          icon: google_map.BitmapDescriptor.fromBytes(
-            await getBytesFromAsset(Assets.iconsMainColorMarker, 40.0.r),
-          ),
+          icon: google_map.BitmapDescriptor.defaultMarkerWithHue(10),
         );
     }
   }
