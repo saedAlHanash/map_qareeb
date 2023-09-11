@@ -30,14 +30,12 @@ class MapWidget extends StatefulWidget {
     this.search,
     this.updateMarkerWithZoom,
     this.onMapClick,
-    this.onTapMarker,
     this.atherListener = true,
   }) : super(key: key);
 
   final Function(MapController controller)? onMapReady;
   final Function(google.LatLng latLng)? onMapClick;
   final Function()? search;
-  final Function(MyMarker marker)? onTapMarker;
   final google.LatLng? initialPoint;
   final bool? updateMarkerWithZoom;
   final bool atherListener;
@@ -279,7 +277,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     return state.markers.values
         .mapIndexed(
           (i, e) {
-            return e.getWidget(i, onTapMarker: widget.onTapMarker);
+            return e.getWidget(i);
           },
         )
         .take(state.mapZoom.getZoomMarkerCount)

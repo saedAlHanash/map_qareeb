@@ -135,7 +135,7 @@ class MyMarker {
     this.type = MyMarkerType.location,
   });
 
-  Marker getWidget(int index, {Function(MyMarker marker)? onTapMarker}) {
+  Marker getWidget(int index) {
     switch (type) {
       case MyMarkerType.location:
         return Marker(
@@ -157,7 +157,7 @@ class MyMarker {
           width: 150.0.spMin,
           builder: (context) {
             return InkWell(
-              onTap: onTapMarker == null ? null : () => onTapMarker.call(this),
+              onTap: onTapMarker1 == null ? null : () => onTapMarker1!.call(this),
               child: Column(
                 children: [
                   const ImageMultiType(
