@@ -52,7 +52,6 @@ Future<Uint8List> getBytesFromCanvas(int width, int height) async {
   return data?.buffer.asUint8List() ?? Uint8List(0);
 }
 
-
 extension IconPoint on num {
   String get iconPoint {
     final data = toInt() + 1;
@@ -120,6 +119,8 @@ class MyMarker {
   double? bearing;
   MyMarkerType type;
   dynamic item;
+  Size? markerSize;
+  Widget? costumeMarker;
   Function(dynamic item)? onTapMarker1;
 
   ///Number of users pickup
@@ -130,8 +131,10 @@ class MyMarker {
     this.key,
     this.bearing,
     this.item,
+    this.markerSize,
     this.nou = '',
     this.onTapMarker1,
+    this.costumeMarker,
     this.type = MyMarkerType.location,
   });
 
@@ -140,113 +143,115 @@ class MyMarker {
       case MyMarkerType.location:
         return Marker(
           point: ll.LatLng(point.latitude, point.longitude),
-          height: 40.0.r,
-          width: 40.0.r,
+          height: markerSize?.height ?? 40.0.r,
+          width: markerSize?.width ?? 40.0.r,
           builder: (context) {
-            return ImageMultiType(
-              url: Assets.iconsMainColorMarker,
-              height: 40.0.r,
-              width: 40.0.r,
-            );
+            return costumeMarker ??
+                ImageMultiType(
+                  url: Assets.iconsMainColorMarker,
+                  height: 40.0.r,
+                  width: 40.0.r,
+                );
           },
         );
       case MyMarkerType.point:
         return Marker(
           point: ll.LatLng(point.latitude, point.longitude),
-          height: 110.0.spMin,
-          width: 150.0.spMin,
+          height: markerSize?.height ?? 110.0.spMin,
+          width: markerSize?.width ?? 150.0.spMin,
           builder: (context) {
-            return InkWell(
-              onTap: onTapMarker1 == null ? null : () => onTapMarker1!.call(this),
-              child: Column(
-                children: [
-                  const ImageMultiType(
-                    url: Assets.iconsMainColorMarker,
-                    height: 35.0,
-                    width: 35.0,
-                    color: Colors.black,
-                  ),
-                  if (item is TripPoint)
-                    SizedBox(
-                      width: 150.0.spMin,
-                      child: DrawableText(
-                        selectable: false,
-                        text: (item as TripPoint).arName,
-                        size: 14.0.sp,
-                        maxLines: 2,
-                        fontFamily: FontManager.cairoBold,
-                        matchParent: true,
-                        textAlign: TextAlign.center,
+            return costumeMarker ??
+                InkWell(
+                  onTap: onTapMarker1 == null ? null : () => onTapMarker1!.call(this),
+                  child: Column(
+                    children: [
+                      const ImageMultiType(
+                        url: Assets.iconsMainColorMarker,
+                        height: 35.0,
+                        width: 35.0,
+                        color: Colors.black,
                       ),
-                    ),
-                ],
-              ),
-            );
+                      if (item is TripPoint)
+                        SizedBox(
+                          width: 150.0.spMin,
+                          child: DrawableText(
+                            selectable: false,
+                            text: (item as TripPoint).arName,
+                            size: 14.0.sp,
+                            maxLines: 2,
+                            fontFamily: FontManager.cairoBold,
+                            matchParent: true,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
           },
         );
       case MyMarkerType.sharedPint:
         return Marker(
           point: ll.LatLng(point.latitude, point.longitude),
-          height: 50.0.r,
-          width: 50.0.r,
+          height: markerSize?.height ?? 50.0.r,
+          width: markerSize?.width ?? 50.0.r,
           builder: (context) {
-            return Builder(builder: (context) {
-              return InkWell(
-                onTap: onTapMarker1 == null ? null : () => onTapMarker1?.call(item),
-                child: Column(
-                  children: [
-                    if (nou.isNotEmpty)
-                      Container(
-                        height: 35.0.r,
-                        width: 70.0.r,
-                        margin: EdgeInsets.only(bottom: 5.0.r),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5.0.r),
+            return costumeMarker ??
+                InkWell(
+                  onTap: onTapMarker1 == null ? null : () => onTapMarker1?.call(item),
+                  child: Column(
+                    children: [
+                      if (nou.isNotEmpty)
+                        Container(
+                          height: 35.0.r,
+                          width: 70.0.r,
+                          margin: EdgeInsets.only(bottom: 5.0.r),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5.0.r),
+                          ),
+                          alignment: Alignment.center,
+                          child: DrawableText(
+                            text: '$nou مقعد',
+                            color: Colors.black,
+                            size: 12.0.sp,
+                          ),
                         ),
-                        alignment: Alignment.center,
-                        child: DrawableText(
-                          text: '$nou مقعد',
-                          color: Colors.black,
-                          size: 12.0.sp,
-                        ),
+                      ImageMultiType(
+                        url: index.iconPoint,
+                        height: 50.0.r,
+                        width: 50.0.r,
                       ),
-                    ImageMultiType(
-                      url: index.iconPoint,
-                      height: 50.0.r,
-                      width: 50.0.r,
-                    ),
-                  ],
-                ),
-              );
-            });
+                    ],
+                  ),
+                );
           },
         );
       case MyMarkerType.driver:
       case MyMarkerType.bus:
         return Marker(
           point: ll.LatLng(point.latitude, point.longitude),
-          height: 150.0.spMin,
-          width: 150.0.spMin,
+          height: markerSize?.height ?? 150.0.spMin,
+          width: markerSize?.width ?? 150.0.spMin,
           builder: (context) {
             Ime? imei;
             if (item is Ime) imei = item as Ime;
 
-            return InkWell(
-              onTap: onTapMarker1 == null ? null : () => onTapMarker1?.call(item),
-              child: Column(
-                children: [
-                  Transform.rotate(
-                    angle: bearing ?? 0.0,
-                    child: ImageMultiType(
-                      url: Assets.iconsCarTopView,
-                      height: 40.0.spMin,
-                      width: 40.0.spMin,
-                    ),
+            return costumeMarker ??
+                InkWell(
+                  onTap: onTapMarker1 == null ? null : () => onTapMarker1?.call(item),
+                  child: Column(
+                    children: [
+                      Transform.rotate(
+                        angle: bearing ?? 0.0,
+                        child: ImageMultiType(
+                          url: Assets.iconsCarTopView,
+                          height: 40.0.spMin,
+                          width: 40.0.spMin,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
+                );
           },
         );
     }
@@ -267,7 +272,6 @@ class MyMarker {
           icon: icon,
         );
       default:
-
         return google_map.Marker(
           markerId: google_map.MarkerId(key.toString()),
           position: point,
