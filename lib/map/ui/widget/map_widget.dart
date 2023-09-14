@@ -113,7 +113,6 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         ),
         BlocListener<MapControllerCubit, MapControllerInitial>(
           listener: (context, state) async {
-
             if (state.point != null) {
               controller.animateTo(dest: state.point!.ll2, zoom: state.zoom);
             }
@@ -274,14 +273,17 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   }
 
   List<Marker> initMarker(MapControllerInitial state) {
-    return state.markers.values
+    final markers = state.markers.values
         .mapIndexed(
           (i, e) {
             return e.getWidget(i);
           },
         )
         .take(state.mapZoom.getZoomMarkerCount)
+        .where((marker) => controller.bounds?.contains(marker.point) ?? true)
         .toList();
+    loggerObject.wtf(markers.length);
+    return markers;
   }
 
   List<Polyline> initPolyline(MapControllerInitial state) {
@@ -368,11 +370,11 @@ class MapTypeSpinner extends StatelessWidget {
 
 extension DoubleHealper on double {
   int get getZoomMarkerCount {
-    if (this >= 10 && this < 13 || this < 10) return 10;
-    if (this >= 13 && this < 14) return 15;
-    if (this >= 14 && this < 15) return 30;
-    if (this >= 15 && this < 16) return 40;
-    if (this > 16) return 100000;
+    if (this >= 11 && this < 12 || this < 10) return 10;
+    if (this >= 12 && this < 13) return 15;
+    if (this >= 13 && this < 14) return 30;
+    if (this >= 14 && this < 15) return 40;
+    if (this > 15) return 100000;
 
     return 100000;
   }

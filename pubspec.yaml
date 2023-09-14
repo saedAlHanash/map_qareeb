@@ -30,6 +30,10 @@ dependencies:
       url: https://github.com/saedAlHanash/qareeb_models
 
 
+#  qareeb_models:
+#    path: ../../packages/qareeb_models
+
+
   google_maps_flutter: ^2.5.0
   flutter_bloc: any
   #  dartz: ^0.10.1
