@@ -292,6 +292,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     return markers;
   }
 
+
   List<Polyline> initPolyline(MapControllerInitial state) {
     return state.polyLines.values.mapIndexed(
       (i, e) {
