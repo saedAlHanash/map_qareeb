@@ -29,7 +29,7 @@ Future<Uint8List> getBytesFromCanvas(int width, int height) async {
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
   final Paint paint = Paint()..color = Colors.blue;
-  final Radius radius = Radius.circular(20.0);
+  const  radius =  Radius.circular(20.0);
   canvas.drawRRect(
       RRect.fromRectAndCorners(
         Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
@@ -40,7 +40,7 @@ Future<Uint8List> getBytesFromCanvas(int width, int height) async {
       ),
       paint);
   TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
-  painter.text = TextSpan(
+  painter.text = const TextSpan(
     text: 'Hello world',
     style: TextStyle(fontSize: 25.0, color: Colors.white),
   );
@@ -51,6 +51,7 @@ Future<Uint8List> getBytesFromCanvas(int width, int height) async {
   final data = await img.toByteData(format: ui.ImageByteFormat.png);
   return data?.buffer.asUint8List() ?? Uint8List(0);
 }
+
 
 extension IconPoint on num {
   String get iconPoint {
@@ -162,7 +163,7 @@ class MyMarker {
           builder: (context) {
             return costumeMarker ??
                 InkWell(
-                  onTap: onTapMarker1 == null ? null : () => onTapMarker1!.call(this),
+                  onTap: onTapMarker1 == null ? null : () => onTapMarker1!.call(item),
                   child: Column(
                     children: [
                       const ImageMultiType(
@@ -259,8 +260,8 @@ class MyMarker {
 
   Future<google_map.Marker> getWidgetGoogleMap(
       {required int index,
-      required num key,
-      Function(MyMarker marker)? onTapMarker}) async {
+        required num key,
+        Function(MyMarker marker)? onTapMarker}) async {
     switch (type) {
       case MyMarkerType.location:
         final icon = google_map.BitmapDescriptor.fromBytes(

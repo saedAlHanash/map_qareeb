@@ -26,7 +26,7 @@ part 'map_controller_state.dart';
 const _singleMarkerKey = -5622;
 
 extension PathMap on TripPath {
-  List<MyMarker> getMarkers() {
+  List<MyMarker> getMarkers({Function(dynamic item)? onTapMarker}) {
     final list = <MyMarker>[];
     edges.forEachIndexed(
       (i, e) {
@@ -34,7 +34,13 @@ extension PathMap on TripPath {
           list.add(
               MyMarker(point: e.startPoint.getLatLng, type: MyMarkerType.sharedPint));
         }
-        list.add(MyMarker(point: e.endPoint.getLatLng, type: MyMarkerType.sharedPint));
+        list.add(
+          MyMarker(
+            point: e.endPoint.getLatLng,
+            type: MyMarkerType.sharedPint,
+            onTapMarker1: onTapMarker,
+          ),
+        );
       },
     );
 
@@ -117,9 +123,9 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addPath({required TripPath path}) {
+  void addPath({required TripPath path, Function(dynamic item)? onTapMarker}) {
     clearMap(false);
-    addMarkers(marker: path.getMarkers(), update: false);
+    addMarkers(marker: path.getMarkers(onTapMarker: onTapMarker), update: false);
     addEncodedPolyLines(myPolyLines: path.getPolyLines(), update: false);
     centerPointMarkers();
     emit(state.copyWith(
@@ -264,12 +270,18 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
   }
 
-  void addAllPoints({required List<TripPoint> points}) {
+  void addAllPoints(
+      {required List<TripPoint> points, Function(dynamic item)? onTapMarker}) {
     state.markers.clear();
     addMarkers(
         marker: points.mapIndexed(
       (i, e) {
-        return MyMarker(point: e.getLatLng, type: MyMarkerType.point, key: e.id, item: e);
+        return MyMarker(
+            point: e.getLatLng,
+            type: MyMarkerType.point,
+            key: e.id,
+            item: e,
+            onTapMarker1: onTapMarker,);
       },
     ).toList());
   }
