@@ -273,16 +273,22 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   }
 
   List<Marker> initMarker(MapControllerInitial state) {
-    final markers = state.markers.values
-        .mapIndexed(
-          (i, e) {
-            return e.getWidget(i);
-          },
-        )
-        .take(state.mapZoom.getZoomMarkerCount)
-        .where((marker) => controller.bounds?.contains(marker.point) ?? true)
-        .toList();
-    loggerObject.wtf(markers.length);
+    List<Marker> markers = [];
+    final m = state.markers.values.mapIndexed(
+      (i, e) {
+        return e.getWidget(i);
+      },
+    );
+
+    if (widget.updateMarkerWithZoom ?? false) {
+      markers.addAll(m
+          .take(state.mapZoom.getZoomMarkerCount)
+          .where((marker) => controller.bounds?.contains(marker.point) ?? true)
+          .toList());
+    } else {
+      markers.addAll(m.toList());
+    }
+
     return markers;
   }
 
