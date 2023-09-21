@@ -32,12 +32,12 @@ class Assets {
   static const String iconsB = 'assets/icons/b.svg';
   static const String iconsBlackMarker = 'assets/icons/black_marker.svg';
   static const String iconsC = 'assets/icons/c.svg';
-  static const String iconsCarTopView =
-      'https://for-delete-c0d5f.web.app/assets/assets/icons/car_top_view.png';
+  static const String iconsCarTopView = 'assets/icons/car_top_view.png';
   static const String iconsD = 'assets/icons/d.svg';
   static const String iconsE = 'assets/icons/e.svg';
   static const String iconsLocator = 'assets/icons/locator.svg';
   static const String iconsMainColorMarker = 'assets/icons/main_color_marker.svg';
   static const String iconsMarkerStart = 'assets/icons/marker_start.svg';
   static const String iconsQareebPoint = 'assets/icons/qareeb_point.svg';
+
 }
