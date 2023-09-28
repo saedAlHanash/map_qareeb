@@ -170,11 +170,11 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     ));
   }
 
-  void centerPointMarkers() {
+  void centerPointMarkers({bool withDriver = false}) {
     state.centerZoomPoints.clear();
 
     for (var e in state.markers.values) {
-      if (e.type != MyMarkerType.driver) {
+      if (e.type != MyMarkerType.driver || withDriver) {
         state.centerZoomPoints.add(e.point);
       }
     }
@@ -277,11 +277,12 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
         marker: points.mapIndexed(
       (i, e) {
         return MyMarker(
-            point: e.getLatLng,
-            type: MyMarkerType.point,
-            key: e.id,
-            item: e,
-            onTapMarker1: onTapMarker,);
+          point: e.getLatLng,
+          type: MyMarkerType.point,
+          key: e.id,
+          item: e,
+          onTapMarker1: onTapMarker,
+        );
       },
     ).toList());
   }
