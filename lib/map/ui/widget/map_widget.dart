@@ -134,7 +134,8 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         mapController: controller,
         options: MapOptions(
           maxZoom: maxZoom,
-          center: widget.initialPoint?.ll2 ?? initialPoint.ll2,
+          center: widget.initialPoint?.ll2 ??
+              (widget.iosTestMode ? initialPointBaghdad.ll2 : initialPoint.ll2),
           onPositionChanged: (position, hasGesture) {
             // Fill your stream when your position changes
             final zoom = position.zoom;
@@ -404,6 +405,7 @@ extension GLatLngHealper on ll.LatLng {
 final List<String> imeis = [];
 
 const initialPoint = google.LatLng(33.514631885313264, 36.27654397981723);
+const initialPointBaghdad = google.LatLng(33.313120604340895, 44.37581771812867);
 
 class CachedTileProvider extends TileProvider {
   @override
