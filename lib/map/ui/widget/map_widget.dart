@@ -31,6 +31,7 @@ class MapWidget extends StatefulWidget {
     this.updateMarkerWithZoom,
     this.onMapClick,
     this.atherListener = true,
+    this.iosTestMode = false,
   }) : super(key: key);
 
   final Function(MapController controller)? onMapReady;
@@ -39,6 +40,7 @@ class MapWidget extends StatefulWidget {
   final google.LatLng? initialPoint;
   final bool? updateMarkerWithZoom;
   final bool atherListener;
+  final bool iosTestMode;
 
   static initImeis(List<String> imei) => imeis
     ..clear()
@@ -57,7 +59,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     vsync: this,
   );
 
-  String tile = 'https://maps.almobtakiroon.com/osm/tile/{z}/{x}/{y}.png';
+  var tile = 'https://maps.almobtakiroon.com/osm/tile/{z}/{x}/{y}.png';
 
   var bearing = 0.0;
   var maxZoom = 18.0;
@@ -153,9 +155,10 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           zoom: 12.0,
         ),
         nonRotatedChildren: [
-          MapTypeSpinner(
-            controller: controller,
-          ),
+          if (!widget.iosTestMode)
+            MapTypeSpinner(
+              controller: controller,
+            ),
           if (widget.search != null)
             Positioned(
               top: 100.0.h,
@@ -243,6 +246,10 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
+    if (widget.iosTestMode) {
+      tile = 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    }
+
     mapControllerCubit = context.read<MapControllerCubit>();
 
     // Add your listener
@@ -291,7 +298,6 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
     return markers;
   }
-
 
   List<Polyline> initPolyline(MapControllerInitial state) {
     return state.polyLines.values.mapIndexed(
