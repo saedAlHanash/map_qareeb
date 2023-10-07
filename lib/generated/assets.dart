@@ -41,3 +41,4 @@ class Assets {
   static const String iconsQareebPoint = 'assets/icons/qareeb_point.svg';
 
 }
+
