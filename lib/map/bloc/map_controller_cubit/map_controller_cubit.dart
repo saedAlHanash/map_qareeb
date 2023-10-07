@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
@@ -58,11 +59,13 @@ extension PathMap on TripPath {
   }
 }
 
-extension NormalTripMap on TripResult {
+extension NormalTripMap on Trip {
   List<MyMarker> getMarkers() {
     return [
       MyMarker(point: startPoint, type: MyMarkerType.sharedPint),
       MyMarker(point: endPoint, type: MyMarkerType.sharedPint),
+      if (preAcceptPoint != null)
+        MyMarker(point: preAcceptPoint!, costumeMarker: 0.0.verticalSpace),
     ];
   }
 }
@@ -134,11 +137,41 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     ));
   }
 
-  void addTrip({required TripResult trip}) {
-    addMarkers(marker: trip.getMarkers());
+  void addTrip({required Trip trip}) {
+    addMarkers(
+      marker: trip.getMarkers(),
+    );
+
     centerPointMarkers();
 
-    addPolyLine(start: trip.startPoint, end: trip.endPoint);
+    addEncodedPolyLine(
+      myPolyLine: MyPolyLine(
+        encodedPolyLine: trip.estimatedPath,
+      ),
+      update: false,
+    );
+
+    if (trip.preAcceptPath.isNotEmpty) {
+      addEncodedPolyLine(
+        myPolyLine: MyPolyLine(
+          encodedPolyLine: trip.preAcceptPath,
+          color: Colors.green,
+        ),
+        update: false,
+      );
+    }
+
+    if (trip.actualPath.isNotEmpty) {
+      addEncodedPolyLine(
+        myPolyLine: MyPolyLine(
+          encodedPolyLine: trip.actualPath,
+          color: Colors.red,
+        ),
+        update: false,
+      );
+    }
+
+
     emit(state.copyWith(
       point: trip.startPoint,
       markerNotifier: state.markerNotifier + 1,
@@ -220,14 +253,20 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addEncodedPolyLine({required MyPolyLine myPolyLine}) {
-    if (myPolyLine.key == null && myPolyLine.endPoint == null) return;
-
+  void addEncodedPolyLine({required MyPolyLine myPolyLine, bool update = true}) {
     var list = decodePolyline(myPolyLine.encodedPolyLine).unpackPolyline();
+
+    myPolyLine.endPoint = TripPoint.fromJson({
+      "latitude": list.lastOrNull?.latitude,
+      "langitude": list.lastOrNull?.longitude,
+    });
+
     state.polyLines[myPolyLine.key ?? myPolyLine.endPoint.hashCode] =
         Pair(list, myPolyLine.color ?? Colors.black);
 
-    emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
+    if (update) {
+      emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
+    }
   }
 
   void addEncodedPolyLines({required List<MyPolyLine> myPolyLines, bool update = true}) {
