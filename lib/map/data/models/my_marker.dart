@@ -234,9 +234,6 @@ class MyMarker {
           height: markerSize?.height ?? 150.0.spMin,
           width: markerSize?.width ?? 150.0.spMin,
           builder: (context) {
-            Ime? imei;
-            if (item is Ime) imei = item as Ime;
-
             return costumeMarker ??
                 InkWell(
                   onTap: onTapMarker1 == null ? null : () => onTapMarker1?.call(item),
