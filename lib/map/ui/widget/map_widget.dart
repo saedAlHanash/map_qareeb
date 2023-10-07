@@ -13,7 +13,6 @@ import 'package:latlong2/latlong.dart' as ll;
 import 'package:image_multi_type/image_multi_type.dart';
 
 import 'package:qareeb_models/global.dart';
-import 'package:saed_http/api_manager/api_service.dart';
 
 import '../../../generated/assets.dart';
 import '../../animate_marker/animated_marker_layer.dart';
@@ -44,7 +43,8 @@ class MapWidget extends StatefulWidget {
 
   static initImeis(List<String> imei) => imeis
     ..clear()
-    ..addAll(imei);
+    ..addAll(imei)
+    ..removeWhere((element) => element.isEmpty);
 
   GlobalKey<MapWidgetState> getKey() {
     return GlobalKey<MapWidgetState>();
@@ -121,10 +121,12 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
             if (state.centerZoomPoints.isNotEmpty) {
               await controller.centerOnPoints(
-                  state.centerZoomPoints.map((e) => e.ll2).toList(),
-                  options: const FitBoundsOptions(
-                    forceIntegerZoomLevel: true,
-                  ));
+                state.centerZoomPoints.map((e) => e.ll2).toList(),
+                options: const FitBoundsOptions(
+                  forceIntegerZoomLevel: true,
+                  padding: EdgeInsets.all(30.0)
+                ),
+              );
             }
           },
         ),
