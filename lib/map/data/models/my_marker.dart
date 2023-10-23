@@ -244,7 +244,7 @@ class MyMarker {
                         child: ImageMultiType(
                           url: Assets.iconsCarTopView,
                           height: 40.0.spMin,
-                          width: 40.0.spMin,
+                          fit: BoxFit.fill,
                         ),
                       ),
                     ],

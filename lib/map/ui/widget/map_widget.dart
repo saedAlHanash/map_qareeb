@@ -184,7 +184,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         ],
         children: [
           TileLayer(
-            urlTemplate: tile,
+            urlTemplate: 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
             tileProvider: CachedTileProvider(),
           ),
           BlocBuilder<MapControllerCubit, MapControllerInitial>(
