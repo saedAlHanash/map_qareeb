@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:qareeb_models/extensions.dart';
 
 import 'package:qareeb_models/global.dart';
-import 'package:saed_http/api_manager/api_service.dart';
-import 'package:saed_http/api_manager/server_proxy/server_proxy_request.dart';
-import 'package:saed_http/api_manager/server_proxy/server_proxy_service.dart';
-import 'package:saed_http/pair_class.dart';
 
+import '../../../api_manager/api_service.dart';
+import '../../../api_manager/pair_class.dart';
+import '../../../api_manager/server_proxy/server_proxy_request.dart';
+import '../../../api_manager/server_proxy/server_proxy_service.dart';
 import '../../../error_manager.dart';
 import '../../data/response/search_location_response.dart';
 

@@ -17,9 +17,10 @@ import 'package:qareeb_models/osrm/data/response/osrm_model.dart';
 import 'package:qareeb_models/points/data/model/trip_point.dart';
 import 'package:qareeb_models/trip_path/data/models/trip_path.dart';
 import 'package:qareeb_models/trip_process/data/response/trip_response.dart';
-import 'package:saed_http/api_manager/api_service.dart';
-import 'package:saed_http/pair_class.dart';
 
+
+import '../../../api_manager/api_service.dart';
+import '../../../api_manager/pair_class.dart';
 import '../../data/models/my_marker.dart';
 
 part 'map_controller_state.dart';
@@ -292,7 +293,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
       {required LatLng start, required LatLng end}) async {
     final response = await APIService().getApi(
         url: 'route/v1/driving',
-        hostName: 'router.project-osrm.org',
+        host: 'router.project-osrm.org',
         path: '${start.longitude},${start.latitude};'
             '${end.longitude},${end.latitude}');
 
