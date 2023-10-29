@@ -18,10 +18,10 @@ import 'package:qareeb_models/points/data/model/trip_point.dart';
 import 'package:qareeb_models/trip_path/data/models/trip_path.dart';
 import 'package:qareeb_models/trip_process/data/response/trip_response.dart';
 
-
 import '../../../api_manager/api_service.dart';
 import '../../../api_manager/pair_class.dart';
 import '../../data/models/my_marker.dart';
+import '../ather_cubit/ather_cubit.dart';
 
 part 'map_controller_state.dart';
 
@@ -172,7 +172,6 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
       );
     }
 
-
     emit(state.copyWith(
       point: trip.startPoint,
       markerNotifier: state.markerNotifier + 1,
@@ -245,7 +244,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   }) async {
     if (start == null || start.latitude == 0 || end.latitude == 0) return;
 
-    final pair = await _getRoutePointApi(start: start, end: end);
+    final pair = await getRoutePointApi(start: start, end: end);
 
     if (pair.first != null) {
       var list = decodePolyline(pair.first!.routes.first.geometry).unpackPolyline();
@@ -289,7 +288,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     if (update) emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
   }
 
-  Future<Pair<OsrmModel?, String?>> _getRoutePointApi(
+  Future<Pair<OsrmModel?, String?>> getRoutePointApi(
       {required LatLng start, required LatLng end}) async {
     final response = await APIService().getApi(
         url: 'route/v1/driving',
@@ -302,6 +301,33 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     } else {
       return Pair(null, 'error');
     }
+  }
+
+  Future<OsrmModel> getRoutePoint(
+      {String? imei, LatLng? start, required LatLng end}) async {
+    if (imei == null && start == null) {
+      throw Exception();
+    }
+    LatLng? lld;
+    if (imei != null) {
+      final dl = await AtherCubit.getDriverLocationAsync(imei);
+      if (dl != null) {
+        lld = dl.getLatLng();
+      }
+    }
+
+    if (lld == null && start == null) {
+      return OsrmModel.fromJson({
+        'routes': [{}]
+      });
+    }
+
+    final pair = await getRoutePointApi(start: start ?? lld!, end: end);
+
+    return pair.first ??
+        OsrmModel.fromJson({
+          'routes': [{}]
+        });
   }
 
   void removePolyLine({LatLng? endPoint, int? key}) {

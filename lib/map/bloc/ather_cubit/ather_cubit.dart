@@ -29,7 +29,7 @@ class AtherCubit extends Cubit<AtherInitial> {
 
     if (ime.isEmpty) return;
 
-    final pair = await _getDriverLocationApi(ime);
+    final pair = await getDriverLocationApi(ime);
 
     if (pair.first != null) {
       if (isClosed) return;
@@ -37,7 +37,7 @@ class AtherCubit extends Cubit<AtherInitial> {
     }
   }
 
-  Future<Pair<List<Ime>?, String?>> _getDriverLocationApi(List<String> ime) async {
+  static Future<Pair<List<Ime>?, String?>> getDriverLocationApi(List<String> ime) async {
     if (isAppleTestFromMapPackage) return Pair([], null);
 
     final pair = await getServerProxyApi(
@@ -61,6 +61,56 @@ class AtherCubit extends Cubit<AtherInitial> {
       return Pair(AtherResponse.fromJson(jsonDecode(pair.first), ime).imes, null);
     } else {
       return Pair(null, pair.second ?? '');
+    }
+  }
+
+  static Future<Ime?> getDriverLocationAsync(String ime) async {
+    if (ime.isEmpty) return null;
+
+    final pair = await getDriverLocationApi([ime]);
+
+    return pair.first?.firstOrNull;
+  }
+  static Future<num> getDriverDistance({
+    required String ime,
+    required DateTime? start,
+    required DateTime? end,
+  }) async {
+    if (start == null) return 0;
+    if (end == null) return 0;
+    if (ime.isEmpty) return 0;
+
+    final pair = await getServerProxyApi(
+      request: ApiServerRequest(
+        url: APIService()
+            .getUri(
+          url: 'api/api.php',
+          query: {
+            'api': 'user',
+            'ver': '1.0',
+            'key': atherKey,
+            'cmd':
+            'OBJECT_GET_MESSAGES,$ime,${start.formatDateAther},${end.formatDateAther}',
+          },
+          hostName: 'admin.alather.net',
+        )
+            .toString(),
+      ),
+    );
+
+    if (pair.first != null) {
+      final list = <LatLng>[];
+      var f1 = jsonDecode(pair.first);
+      for (var e in f1) {
+        list.add(LatLng(double.parse(e[1]), double.parse(e[2])));
+      }
+      var d = 0.0;
+      for (var i = 1; i < list.length; i++) {
+        d += distanceBetween(list[i - 1], list[i]) * 1000;
+      }
+      return d.roundToDouble();
+    } else {
+      return 0;
     }
   }
 }
