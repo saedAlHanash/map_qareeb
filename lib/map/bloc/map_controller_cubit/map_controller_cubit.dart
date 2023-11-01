@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:drawable_text/drawable_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -248,6 +249,29 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
 
     if (pair.first != null) {
       var list = decodePolyline(pair.first!.routes.first.geometry).unpackPolyline();
+      if (list.length > 2) {
+        addMarker(
+          marker: MyMarker(
+            point: list[list.length ~/ 2],
+            costumeMarker: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0.r),
+              ),
+              margin: EdgeInsets.only(bottom: 20.0.h),
+              alignment: Alignment.center,
+              child: DrawableText(
+                text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
+                color: Colors.black,
+                textAlign: TextAlign.center,
+                size: 12.0.sp,
+                matchParent: true,
+              ),
+            ),
+            markerSize: Size(50.0.w, 50.0.h),
+          ),
+        );
+      }
       state.polyLines[key ?? end.hashCode] = Pair(list, Colors.black);
       emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
     }
@@ -256,6 +280,29 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   void addEncodedPolyLine({required MyPolyLine myPolyLine, bool update = true}) {
     var list = decodePolyline(myPolyLine.encodedPolyLine).unpackPolyline();
 
+    if (list.length > 2) {
+      addMarker(
+        marker: MyMarker(
+          point: list[list.length ~/ 2],
+          costumeMarker: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8.0.r),
+            ),
+            margin: EdgeInsets.only(bottom: 20.0.h),
+            alignment: Alignment.center,
+            child: DrawableText(
+              text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
+              color: Colors.black,
+              textAlign: TextAlign.center,
+              size: 12.0.sp,
+              matchParent: true,
+            ),
+          ),
+          markerSize: Size(50.0.w, 50.0.h),
+        ),
+      );
+    }
     myPolyLine.endPoint = TripPoint.fromJson({
       "latitude": list.lastOrNull?.latitude,
       "langitude": list.lastOrNull?.longitude,
@@ -283,6 +330,29 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
       }
       if (e.key == null && e.endPoint == null) return;
       var list = decodePolyline(e.encodedPolyLine).unpackPolyline();
+      if (list.length > 2) {
+        addMarker(
+          marker: MyMarker(
+            point: list[list.length ~/ 2],
+            costumeMarker: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0.r),
+              ),
+              margin: EdgeInsets.only(bottom: 20.0.h),
+              alignment: Alignment.center,
+              child: DrawableText(
+                text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
+                color: Colors.black,
+                textAlign: TextAlign.center,
+                size: 12.0.sp,
+                matchParent: true,
+              ),
+            ),
+            markerSize: Size(50.0.w, 50.0.h),
+          ),
+        );
+      }
       state.polyLines[e.key ?? e.endPoint.hashCode] = Pair(list, e.color ?? Colors.black);
     }
     if (update) emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
