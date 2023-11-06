@@ -9,10 +9,6 @@ class PostUrl {
 }
 
 String get baseUrl {
-  if (Platform.isIOS) {
-    if (isAppleTestFromMapPackage) return testUrl;
-  }
-
   return liveUrl;
 }
 
