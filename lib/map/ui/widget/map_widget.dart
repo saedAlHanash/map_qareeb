@@ -21,6 +21,8 @@ import '../../bloc/map_controller_cubit/map_controller_cubit.dart';
 import '../../bloc/set_point_cubit/map_control_cubit.dart';
 import '../../data/models/my_marker.dart';
 
+bool isAppleTestFromMapPackage = false;
+
 class MapWidget extends StatefulWidget {
   const MapWidget({
     Key? key,
@@ -30,7 +32,6 @@ class MapWidget extends StatefulWidget {
     this.updateMarkerWithZoom,
     this.onMapClick,
     this.atherListener = true,
-    this.iosTestMode = false,
   }) : super(key: key);
 
   final Function(MapController controller)? onMapReady;
@@ -39,7 +40,6 @@ class MapWidget extends StatefulWidget {
   final google.LatLng? initialPoint;
   final bool? updateMarkerWithZoom;
   final bool atherListener;
-  final bool iosTestMode;
 
   static initImeis(List<String> imei) => imeis
     ..clear()
@@ -123,9 +123,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
               await controller.centerOnPoints(
                 state.centerZoomPoints.map((e) => e.ll2).toList(),
                 options: const FitBoundsOptions(
-                  forceIntegerZoomLevel: true,
-                  padding: EdgeInsets.all(30.0)
-                ),
+                    forceIntegerZoomLevel: true, padding: EdgeInsets.all(30.0)),
               );
             }
           },
@@ -137,7 +135,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
         options: MapOptions(
           maxZoom: maxZoom,
           center: widget.initialPoint?.ll2 ??
-              (widget.iosTestMode ? initialPointBaghdad.ll2 : initialPoint.ll2),
+              (isAppleTestFromMapPackage ? initialPointBaghdad.ll2 : initialPoint.ll2),
           onPositionChanged: (position, hasGesture) {
             // Fill your stream when your position changes
             final zoom = position.zoom;
@@ -158,7 +156,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           zoom: 12.0,
         ),
         nonRotatedChildren: [
-          if (!widget.iosTestMode)
+          if (!isAppleTestFromMapPackage)
             MapTypeSpinner(
               controller: controller,
             ),
@@ -243,13 +241,16 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     );
   }
 
-  var stream = Stream.periodic(const Duration(seconds: 15));
+  var stream = Stream.periodic(Duration(
+    seconds: 15,
+    hours: isAppleTestFromMapPackage ? 10 : 0,
+  ));
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.iosTestMode) {
+    if (isAppleTestFromMapPackage) {
       tile = 'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png';
     }
 

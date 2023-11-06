@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:drawable_text/drawable_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,10 +18,11 @@ import 'package:qareeb_models/osrm/data/response/osrm_model.dart';
 import 'package:qareeb_models/points/data/model/trip_point.dart';
 import 'package:qareeb_models/trip_path/data/models/trip_path.dart';
 import 'package:qareeb_models/trip_process/data/response/trip_response.dart';
-import 'package:saed_http/api_manager/api_service.dart';
-import 'package:saed_http/pair_class.dart';
 
+import '../../../api_manager/api_service.dart';
+import '../../../api_manager/pair_class.dart';
 import '../../data/models/my_marker.dart';
+import '../ather_cubit/ather_cubit.dart';
 
 part 'map_controller_state.dart';
 
@@ -171,7 +173,6 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
       );
     }
 
-
     emit(state.copyWith(
       point: trip.startPoint,
       markerNotifier: state.markerNotifier + 1,
@@ -244,10 +245,33 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   }) async {
     if (start == null || start.latitude == 0 || end.latitude == 0) return;
 
-    final pair = await _getRoutePointApi(start: start, end: end);
+    final pair = await getRoutePointApi(start: start, end: end);
 
     if (pair.first != null) {
       var list = decodePolyline(pair.first!.routes.first.geometry).unpackPolyline();
+      if (list.length > 2) {
+        addMarker(
+          marker: MyMarker(
+            point: list[list.length ~/ 2],
+            costumeMarker: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0.r),
+              ),
+              margin: EdgeInsets.only(bottom: 20.0.h),
+              alignment: Alignment.center,
+              child: DrawableText(
+                text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
+                color: Colors.black,
+                textAlign: TextAlign.center,
+                size: 12.0.sp,
+                matchParent: true,
+              ),
+            ),
+            markerSize: Size(50.0.w, 50.0.h),
+          ),
+        );
+      }
       state.polyLines[key ?? end.hashCode] = Pair(list, Colors.black);
       emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
     }
@@ -256,6 +280,29 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   void addEncodedPolyLine({required MyPolyLine myPolyLine, bool update = true}) {
     var list = decodePolyline(myPolyLine.encodedPolyLine).unpackPolyline();
 
+    if (list.length > 2) {
+      addMarker(
+        marker: MyMarker(
+          point: list[list.length ~/ 2],
+          costumeMarker: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8.0.r),
+            ),
+            margin: EdgeInsets.only(bottom: 20.0.h),
+            alignment: Alignment.center,
+            child: DrawableText(
+              text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
+              color: Colors.black,
+              textAlign: TextAlign.center,
+              size: 12.0.sp,
+              matchParent: true,
+            ),
+          ),
+          markerSize: Size(50.0.w, 50.0.h),
+        ),
+      );
+    }
     myPolyLine.endPoint = TripPoint.fromJson({
       "latitude": list.lastOrNull?.latitude,
       "langitude": list.lastOrNull?.longitude,
@@ -283,16 +330,39 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
       }
       if (e.key == null && e.endPoint == null) return;
       var list = decodePolyline(e.encodedPolyLine).unpackPolyline();
+      if (list.length > 2) {
+        addMarker(
+          marker: MyMarker(
+            point: list[list.length ~/ 2],
+            costumeMarker: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0.r),
+              ),
+              margin: EdgeInsets.only(bottom: 20.0.h),
+              alignment: Alignment.center,
+              child: DrawableText(
+                text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
+                color: Colors.black,
+                textAlign: TextAlign.center,
+                size: 12.0.sp,
+                matchParent: true,
+              ),
+            ),
+            markerSize: Size(50.0.w, 50.0.h),
+          ),
+        );
+      }
       state.polyLines[e.key ?? e.endPoint.hashCode] = Pair(list, e.color ?? Colors.black);
     }
     if (update) emit(state.copyWith(polylineNotifier: state.polylineNotifier + 1));
   }
 
-  Future<Pair<OsrmModel?, String?>> _getRoutePointApi(
+  Future<Pair<OsrmModel?, String?>> getRoutePointApi(
       {required LatLng start, required LatLng end}) async {
     final response = await APIService().getApi(
         url: 'route/v1/driving',
-        hostName: 'router.project-osrm.org',
+        host: 'router.project-osrm.org',
         path: '${start.longitude},${start.latitude};'
             '${end.longitude},${end.latitude}');
 
@@ -301,6 +371,33 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     } else {
       return Pair(null, 'error');
     }
+  }
+
+  Future<OsrmModel> getRoutePoint(
+      {String? imei, LatLng? start, required LatLng end}) async {
+    if (imei == null && start == null) {
+      throw Exception();
+    }
+    LatLng? lld;
+    if (imei != null) {
+      final dl = await AtherCubit.getDriverLocationAsync(imei);
+      if (dl != null) {
+        lld = dl.getLatLng();
+      }
+    }
+
+    if (lld == null && start == null) {
+      return OsrmModel.fromJson({
+        'routes': [{}]
+      });
+    }
+
+    final pair = await getRoutePointApi(start: start ?? lld!, end: end);
+
+    return pair.first ??
+        OsrmModel.fromJson({
+          'routes': [{}]
+        });
   }
 
   void removePolyLine({LatLng? endPoint, int? key}) {

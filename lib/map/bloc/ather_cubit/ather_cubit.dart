@@ -6,12 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:qareeb_models/extensions.dart';
-import 'package:saed_http/api_manager/api_service.dart';
-import 'package:saed_http/api_manager/server_proxy/server_proxy_request.dart';
-import 'package:saed_http/api_manager/server_proxy/server_proxy_service.dart';
-import 'package:saed_http/pair_class.dart';
+
 import 'package:qareeb_models/global.dart';
+import '../../../api_manager/api_service.dart';
+import '../../../api_manager/pair_class.dart';
+import '../../../api_manager/server_proxy/server_proxy_request.dart';
+import '../../../api_manager/server_proxy/server_proxy_service.dart';
 import '../../data/response/ather_response.dart';
+import '../../ui/widget/map_widget.dart';
 import '../map_controller_cubit/map_controller_cubit.dart';
 
 part 'ather_state.dart';
@@ -22,11 +24,12 @@ class AtherCubit extends Cubit<AtherInitial> {
   AtherCubit() : super(AtherInitial.initial());
 
   Future<void> getDriverLocation(List<String> ime) async {
+    if (isAppleTestFromMapPackage) return;
     if (isClosed) return;
 
     if (ime.isEmpty) return;
 
-    final pair = await _getDriverLocationApi(ime);
+    final pair = await getDriverLocationApi(ime);
 
     if (pair.first != null) {
       if (isClosed) return;
@@ -34,10 +37,9 @@ class AtherCubit extends Cubit<AtherInitial> {
     }
   }
 
-  Future<Pair<List<Ime>?, String?>> _getDriverLocationApi(List<String> ime) async {
-    // var ime = '359632104211708';
-      APIService().innerHeader.addAll({'X-Frame-Options': 'SAMEORIGIN'});
-    APIService().initBaseUrl(baseUrl: 'live.qareeb-maas.com');
+  static Future<Pair<List<Ime>?, String?>> getDriverLocationApi(List<String> ime) async {
+    if (isAppleTestFromMapPackage) return Pair([], null);
+
     final pair = await getServerProxyApi(
       request: ApiServerRequest(
         url: APIService()
@@ -58,10 +60,17 @@ class AtherCubit extends Cubit<AtherInitial> {
     if (pair.first != null) {
       return Pair(AtherResponse.fromJson(jsonDecode(pair.first), ime).imes, null);
     } else {
-      return Pair(null, pair.second?.body ?? '');
+      return Pair(null, pair.second ?? '');
     }
   }
 
+  static Future<Ime?> getDriverLocationAsync(String ime) async {
+    if (ime.isEmpty) return null;
+
+    final pair = await getDriverLocationApi([ime]);
+
+    return pair.first?.firstOrNull;
+  }
   static Future<num> getDriverDistance({
     required String ime,
     required DateTime? start,
@@ -70,24 +79,21 @@ class AtherCubit extends Cubit<AtherInitial> {
     if (start == null) return 0;
     if (end == null) return 0;
     if (ime.isEmpty) return 0;
-    // var ime = '359632104211708';
-    APIService().innerHeader.addAll({'X-Frame-Options': 'SAMEORIGIN'});
-    APIService().initBaseUrl(baseUrl: 'live.qareeb-maas.com');
 
     final pair = await getServerProxyApi(
       request: ApiServerRequest(
         url: APIService()
             .getUri(
-              url: 'api/api.php',
-              query: {
-                'api': 'user',
-                'ver': '1.0',
-                'key': atherKey,
-                'cmd':
-                    'OBJECT_GET_MESSAGES,$ime,${start.formatDateAther},${end.formatDateAther}',
-              },
-              hostName: 'admin.alather.net',
-            )
+          url: 'api/api.php',
+          query: {
+            'api': 'user',
+            'ver': '1.0',
+            'key': atherKey,
+            'cmd':
+            'OBJECT_GET_MESSAGES,$ime,${start.formatDateAther},${end.formatDateAther}',
+          },
+          hostName: 'admin.alather.net',
+        )
             .toString(),
       ),
     );
