@@ -202,9 +202,22 @@ class Params {
     required this.io49,
     required this.io52,
     required this.io249,
+    required this.pump,
+    required this.track,
+    required this.bats,
+    required this.acc,
+    required this.defense,
+    required this.batl,
   });
 
+  final String pump;
+  final String track;
+  final String bats;
+  final String acc;
+  final String defense;
+  final String batl;
   final String gpslev;
+
   final String io239;
   final String io240;
   final String io80;
@@ -353,10 +366,22 @@ class Params {
       io49: json["io49"] ?? "",
       io52: json["io52"] ?? "",
       io249: json["io249"] ?? '',
+      pump: json["pump"] ?? "",
+      track: json["track"] ?? "",
+      bats: json["bats"] ?? "",
+      acc: json["acc"] ?? "",
+      defense: json["defense"] ?? "",
+      batl: json["batl"] ?? "",
     );
   }
 
   Map<String, dynamic> toJson() => {
+        "pump": pump,
+        "track": track,
+        "bats": bats,
+        "acc": acc,
+        "defense": defense,
+        "batl": batl,
         "gpslev": gpslev,
         "io239": io239,
         "io240": io240,
