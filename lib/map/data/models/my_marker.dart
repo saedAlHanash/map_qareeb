@@ -231,8 +231,8 @@ class MyMarker {
       case MyMarkerType.bus:
         return Marker(
           point: ll.LatLng(point.latitude, point.longitude),
-          height: markerSize?.height ?? 150.0.spMin,
-          width: markerSize?.width ?? 150.0.spMin,
+          height: markerSize?.height ?? 170.0.spMin,
+          width: markerSize?.width ?? 170.0.spMin,
           builder: (context) {
             return costumeMarker ??
                 InkWell(
@@ -244,7 +244,7 @@ class MyMarker {
                         child: ImageMultiType(
                           url: Assets.iconsCarTopView,
                           height: 40.0.spMin,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ],

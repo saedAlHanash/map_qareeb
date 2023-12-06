@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 
 import 'package:latlong2/latlong.dart' as ll;
 import 'package:image_multi_type/image_multi_type.dart';
+import 'package:qareeb_models/extensions.dart';
 
 import 'package:qareeb_models/global.dart';
 
@@ -20,6 +21,7 @@ import '../../bloc/ather_cubit/ather_cubit.dart';
 import '../../bloc/map_controller_cubit/map_controller_cubit.dart';
 import '../../bloc/set_point_cubit/map_control_cubit.dart';
 import '../../data/models/my_marker.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
 bool isAppleTestFromMapPackage = false;
 
@@ -30,6 +32,7 @@ class MapWidget extends StatefulWidget {
     this.initialPoint,
     this.search,
     this.updateMarkerWithZoom,
+    this.clustering = false,
     this.onMapClick,
     this.atherListener = true,
   }) : super(key: key);
@@ -39,6 +42,9 @@ class MapWidget extends StatefulWidget {
   final Function()? search;
   final google.LatLng? initialPoint;
   final bool? updateMarkerWithZoom;
+  final bool clustering;
+
+  //clustering
   final bool atherListener;
 
   static initImeis(List<String> imei) => imeis
@@ -198,8 +204,39 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           BlocBuilder<MapControllerCubit, MapControllerInitial>(
             buildWhen: (p, c) => p.markerNotifier != c.markerNotifier,
             builder: (context, state) {
-              return MarkerLayer(
-                markers: initMarker(state),
+              if (widget.clustering) {
+                return MarkerLayer(markers: initMarker(state));
+              }
+              return MarkerClusterLayerWidget(
+                options: MarkerClusterLayerOptions(
+                  centerMarkerOnClick: true,
+                  zoomToBoundsOnClick: true,
+                  maxClusterRadius: 70.0.r.toInt(),
+                  size: Size(50.r, 50.r),
+                  anchor: AnchorPos.align(AnchorAlign.center),
+                  fitBoundsOptions: const FitBoundsOptions(
+                    padding: EdgeInsets.all(50),
+                    maxZoom: 15,
+                  ),
+                  markers: initMarker(state),
+                  builder: (context, markers) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.black,
+                      ),
+                      child: Center(
+                        child: Text(
+                          markers.length.toString(),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0.sp,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               );
             },
           ),
