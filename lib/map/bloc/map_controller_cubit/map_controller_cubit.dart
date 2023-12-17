@@ -128,10 +128,17 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addPath({required TripPath path, Function(dynamic item)? onTapMarker}) {
+  void addPath(
+      {required TripPath path,
+      Function(dynamic item)? onTapMarker,
+      bool? withPathLength}) {
     clearMap(false);
     addMarkers(marker: path.getMarkers(onTapMarker: onTapMarker), update: false);
-    addEncodedPolyLines(myPolyLines: path.getPolyLines(), update: false);
+    addEncodedPolyLines(
+      myPolyLines: path.getPolyLines(),
+      update: false,
+      addPathLength: withPathLength ?? true,
+    );
     centerPointMarkers();
     emit(state.copyWith(
       markerNotifier: state.markerNotifier + 1,

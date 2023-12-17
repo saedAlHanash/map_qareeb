@@ -204,7 +204,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
           BlocBuilder<MapControllerCubit, MapControllerInitial>(
             buildWhen: (p, c) => p.markerNotifier != c.markerNotifier,
             builder: (context, state) {
-              if (widget.clustering) {
+              if (!widget.clustering) {
                 return MarkerLayer(markers: initMarker(state));
               }
               return MarkerClusterLayerWidget(
