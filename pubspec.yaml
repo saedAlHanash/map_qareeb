@@ -25,13 +25,18 @@ dependencies:
 #    git:
 #      url: https://github.com/saedAlHanash/saed_http
 
-  qareeb_models:
-    git:
-      url: https://github.com/saedAlHanash/qareeb_models
+#  qareeb_models:
+#    git:
+#      url: https://github.com/saedAlHanash/qareeb_models
 
 
 #  qareeb_models:
-#    path: ../../packages/qareeb_models
+#   git:
+#    url: https://github.com/saedAlHanash/qareeb_models
+
+
+  qareeb_models:
+    path: ../../packages/qareeb_models
 
 
   google_maps_flutter: ^2.5.0
