@@ -88,7 +88,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
       state.markers.remove(_singleMarkerKey);
     } else {
       state.markers[_singleMarkerKey] = marker;
-      if (moveTo ?? false) movingCamera(point: marker.point);
+      if (moveTo ?? true) movingCamera(point: marker.point);
     }
 
     emit(state.copyWith(markerNotifier: state.markerNotifier + 1));
@@ -128,10 +128,17 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addPath({required TripPath path, Function(dynamic item)? onTapMarker}) {
+  void addPath(
+      {required TripPath path,
+      Function(dynamic item)? onTapMarker,
+      bool? withPathLength}) {
     clearMap(false);
     addMarkers(marker: path.getMarkers(onTapMarker: onTapMarker), update: false);
-    addEncodedPolyLines(myPolyLines: path.getPolyLines(), update: false);
+    addEncodedPolyLines(
+      myPolyLines: path.getPolyLines(),
+      update: false,
+      addPathLength: withPathLength,
+    );
     centerPointMarkers();
     emit(state.copyWith(
       markerNotifier: state.markerNotifier + 1,
@@ -139,7 +146,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     ));
   }
 
-  void addTrip({required Trip trip}) {
+  void addTrip({required Trip trip, bool? withPathLength}) {
     addMarkers(
       marker: trip.getMarkers(),
     );
@@ -147,6 +154,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     centerPointMarkers();
 
     addEncodedPolyLine(
+      addPathLength: withPathLength,
       myPolyLine: MyPolyLine(
         encodedPolyLine: trip.estimatedPath,
       ),
@@ -160,6 +168,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
           color: Colors.green,
         ),
         update: false,
+        addPathLength: withPathLength,
       );
     }
 
@@ -170,6 +179,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
           color: Colors.red,
         ),
         update: false,
+        addPathLength: withPathLength,
       );
     }
 
@@ -180,7 +190,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     ));
   }
 
-  void addTripMediator({required TripMediator trip}) {
+  void addTripMediator({required TripMediator trip, bool? withPathLength}) {
     state.markers.clear();
     state.polyLines.clear();
 
@@ -195,7 +205,10 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
 
     if (trip.canConfirm) {
       centerPointMarkers();
-      addPolyLine(start: trip.startLocation, end: trip.endLocation);
+      addPolyLine(
+          start: trip.startLocation,
+          end: trip.endLocation,
+          addPathLength: withPathLength);
     }
 
     emit(state.copyWith(
@@ -241,6 +254,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   Future<void> addPolyLine({
     required LatLng? start,
     required LatLng end,
+    required bool? addPathLength,
     int? key,
   }) async {
     if (start == null || start.latitude == 0 || end.latitude == 0) return;
@@ -249,7 +263,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
 
     if (pair.first != null) {
       var list = decodePolyline(pair.first!.routes.first.geometry).unpackPolyline();
-      if (list.length > 2) {
+      if ((addPathLength ?? false) && list.length > 2) {
         addMarker(
           marker: MyMarker(
             point: list[list.length ~/ 2],
@@ -277,10 +291,13 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addEncodedPolyLine({required MyPolyLine myPolyLine, bool update = true}) {
+  void addEncodedPolyLine({
+    required MyPolyLine myPolyLine,
+    bool update = true,
+    required bool? addPathLength,
+  }) {
     var list = decodePolyline(myPolyLine.encodedPolyLine).unpackPolyline();
-
-    if (list.length > 2) {
+    if ((addPathLength ?? false) && list.length > 2) {
       addMarker(
         marker: MyMarker(
           point: list[list.length ~/ 2],
@@ -316,7 +333,11 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addEncodedPolyLines({required List<MyPolyLine> myPolyLines, bool update = true}) {
+  void addEncodedPolyLines({
+    required List<MyPolyLine> myPolyLines,
+    bool update = true,
+    required bool? addPathLength,
+  }) {
     state.polyLines.clear();
     for (var e in myPolyLines) {
       if (e.endPoint != null) {
@@ -330,7 +351,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
       }
       if (e.key == null && e.endPoint == null) return;
       var list = decodePolyline(e.encodedPolyLine).unpackPolyline();
-      if (list.length > 2) {
+      if ((addPathLength ?? false) && list.length > 2) {
         addMarker(
           marker: MyMarker(
             point: list[list.length ~/ 2],
