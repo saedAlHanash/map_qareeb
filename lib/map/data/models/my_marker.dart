@@ -180,7 +180,7 @@ class MyMarker {
                             text: (item as TripPoint).arName,
                             size: 14.0.sp,
                             maxLines: 2,
-                            fontFamily: FontManager.cairoBold,
+                            fontFamily: FontManager.cairoBold.name,
                             matchParent: true,
                             textAlign: TextAlign.center,
                           ),
