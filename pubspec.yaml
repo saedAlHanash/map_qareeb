@@ -40,6 +40,7 @@ dependencies:
 
 
   google_maps_flutter: ^2.5.0
+  flutter_map_marker_cluster: any
   flutter_bloc: any
   #  dartz: ^0.10.1
   equatable: ^2.0.5
