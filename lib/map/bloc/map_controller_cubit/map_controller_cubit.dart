@@ -2,15 +2,11 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:drawable_text/drawable_text.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
-
 import 'package:qareeb_models/booking/trip_mediator.dart';
 import 'package:qareeb_models/extensions.dart';
 import 'package:qareeb_models/global.dart';
@@ -22,61 +18,35 @@ import 'package:qareeb_models/trip_process/data/response/trip_response.dart';
 import '../../../api_manager/api_service.dart';
 import '../../../api_manager/pair_class.dart';
 import '../../data/models/my_marker.dart';
+import '../../utile.dart';
 import '../ather_cubit/ather_cubit.dart';
 
 part 'map_controller_state.dart';
-
-const _singleMarkerKey = -5622;
-
-extension PathMap on TripPath {
-  List<MyMarker> getMarkers({Function(dynamic item)? onTapMarker}) {
-    final list = <MyMarker>[];
-    edges.forEachIndexed(
-      (i, e) {
-        if (i == 0) {
-          list.add(
-              MyMarker(point: e.startPoint.getLatLng, type: MyMarkerType.sharedPint));
-        }
-        list.add(
-          MyMarker(
-            point: e.endPoint.getLatLng,
-            type: MyMarkerType.sharedPint,
-            onTapMarker1: onTapMarker,
-          ),
-        );
-      },
-    );
-
-    return list;
-  }
-
-  List<MyPolyLine> getPolyLines() {
-    final list = <MyPolyLine>[];
-
-    edges.forEachIndexed((i, e) {
-      list.add(MyPolyLine(key: i, encodedPolyLine: e.steps));
-    });
-
-    return list;
-  }
-}
-
-extension NormalTripMap on Trip {
-  List<MyMarker> getMarkers() {
-    return [
-      MyMarker(point: startPoint, type: MyMarkerType.sharedPint),
-      MyMarker(point: endPoint, type: MyMarkerType.sharedPint),
-      if (preAcceptPoint != null)
-        MyMarker(point: preAcceptPoint!, costumeMarker: 0.0.verticalSpace),
-    ];
-  }
-}
 
 class MapControllerCubit extends Cubit<MapControllerInitial> {
   MapControllerCubit() : super(MapControllerInitial.initial());
 
   var mapHeight = 640.0;
   var mapWidth = 360.0;
+
+  void setGoogleMap(GoogleMapController controller) => state.controller = controller;
+
+  GoogleMapController? get controller => state.controller;
+
+  Future<LatLng?> get getCenter async {
+    if (controller == null) return null;
+
+    LatLngBounds bounds = await controller!.getVisibleRegion();
+
+    LatLng center = LatLng(
+      (bounds.northeast.latitude + bounds.southwest.latitude) / 2,
+      (bounds.northeast.longitude + bounds.southwest.longitude) / 2,
+    );
+
+    return center;
+  }
+
+  void test() {}
 
   void addMarker({required MyMarker marker}) {
     state.markers[marker.key ?? marker.point.hashCode] = marker;
@@ -85,9 +55,9 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
 
   void addSingleMarker({required MyMarker? marker, bool? moveTo}) {
     if (marker == null) {
-      state.markers.remove(_singleMarkerKey);
+      state.markers.remove(singleMarkerKey);
     } else {
-      state.markers[_singleMarkerKey] = marker;
+      state.markers[singleMarkerKey] = marker;
       if (moveTo ?? true) movingCamera(point: marker.point);
     }
 
@@ -118,7 +88,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   }
 
   void clearMap(bool update) {
-    state.markers.removeWhere((key, value) => key != _singleMarkerKey);
+    state.markers.removeWhere((key, value) => key != singleMarkerKey);
     state.polyLines.clear();
     if (update) {
       emit(state.copyWith(
@@ -128,10 +98,9 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addPath(
-      {required TripPath path,
-      Function(dynamic item)? onTapMarker,
-      bool? withPathLength}) {
+  void addPath({required TripPath path,
+    Function(dynamic item)? onTapMarker,
+    bool? withPathLength}) {
     clearMap(false);
     addMarkers(marker: path.getMarkers(onTapMarker: onTapMarker), update: false);
     addEncodedPolyLines(
@@ -218,6 +187,7 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   }
 
   void centerPointMarkers({bool withDriver = false}) {
+    if (state.markers.length == 1) return;
     state.centerZoomPoints.clear();
 
     for (var e in state.markers.values) {
@@ -251,6 +221,12 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     emit(state.copyWith(markerNotifier: state.markerNotifier + 1));
   }
 
+  void update(){
+    emit(state.copyWith(
+      markerNotifier: state.markerNotifier + 1,
+      polylineNotifier: state.polylineNotifier + 1,
+    ));
+  }
   Future<void> addPolyLine({
     required LatLng? start,
     required LatLng end,
@@ -267,22 +243,10 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
         addMarker(
           marker: MyMarker(
             point: list[list.length ~/ 2],
-            costumeMarker: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0.r),
-              ),
-              margin: EdgeInsets.only(bottom: 20.0.h),
-              alignment: Alignment.center,
-              child: DrawableText(
-                text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
-                color: Colors.black,
-                textAlign: TextAlign.center,
-                size: 12.0.sp,
-                matchParent: true,
-              ),
+            costumeMarker: PathLengthWidget(
+              text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
             ),
-            markerSize: Size(50.0.w, 50.0.h),
+            markerSize: Size(70.0.r, 70.0.r),
           ),
         );
       }
@@ -301,22 +265,10 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
       addMarker(
         marker: MyMarker(
           point: list[list.length ~/ 2],
-          costumeMarker: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8.0.r),
-            ),
-            margin: EdgeInsets.only(bottom: 20.0.h),
-            alignment: Alignment.center,
-            child: DrawableText(
-              text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
-              color: Colors.black,
-              textAlign: TextAlign.center,
-              size: 12.0.sp,
-              matchParent: true,
-            ),
+          costumeMarker: PathLengthWidget(
+            text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
           ),
-          markerSize: Size(50.0.w, 50.0.h),
+          markerSize: Size(70.0.r, 70.0.r),
         ),
       );
     }
@@ -355,22 +307,10 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
         addMarker(
           marker: MyMarker(
             point: list[list.length ~/ 2],
-            costumeMarker: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0.r),
-              ),
-              margin: EdgeInsets.only(bottom: 20.0.h),
-              alignment: Alignment.center,
-              child: DrawableText(
-                text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
-                color: Colors.black,
-                textAlign: TextAlign.center,
-                size: 12.0.sp,
-                matchParent: true,
-              ),
+            costumeMarker: PathLengthWidget(
+              text: '${(calculateDistance(list) / 1000).toStringAsFixed(1)} كم',
             ),
-            markerSize: Size(50.0.w, 50.0.h),
+            markerSize: Size(70.0.r, 70.0.r),
           ),
         );
       }
@@ -432,16 +372,16 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     state.markers.clear();
     addMarkers(
         marker: points.mapIndexed(
-      (i, e) {
-        return MyMarker(
-          point: e.getLatLng,
-          type: MyMarkerType.point,
-          key: e.id,
-          item: e,
-          onTapMarker1: onTapMarker,
-        );
-      },
-    ).toList());
+              (i, e) {
+            return MyMarker(
+              point: e.getLatLng,
+              type: MyMarkerType.point,
+              key: e.id,
+              item: e,
+              onTapMarker1: onTapMarker,
+            );
+          },
+        ).toList());
   }
 
   void updateMarkersWithZoom(double zoom) {

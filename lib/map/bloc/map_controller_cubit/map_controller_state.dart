@@ -14,13 +14,14 @@ class MapControllerInitial {
   ///Camera Zoom
   final double zoom;
 
+   GoogleMapController? controller;
+
   ///all markers that set over map
   final Map<num, MyMarker> markers = {};
 
   ///all poly lines that drawn over Map,
   ///Key is hash is : end point hashing (for find and delete )
-  final Map<num, Pair<List<LatLng>,Color>> polyLines = {};
-
+  final Map<num, Pair<List<LatLng>, Color>> polyLines = {};
 
   final int markerNotifier;
   final int polylineNotifier;
@@ -36,6 +37,7 @@ class MapControllerInitial {
     this.mapZoom = 11,
     required this.initialPoint,
     this.oldPoint,
+    this.controller,
     required this.bearing,
   });
 
@@ -64,9 +66,10 @@ class MapControllerInitial {
     LatLng? oldPoint,
     double? bearing,
     double? zoom,
-        double? mapZoom,
+    double? mapZoom,
     int? markerNotifier,
     int? polylineNotifier,
+    GoogleMapController? controller,
   }) {
     return MapControllerInitial(
       point: point,
@@ -76,7 +79,8 @@ class MapControllerInitial {
       oldPoint: oldPoint ?? this.oldPoint,
       bearing: bearing ?? this.bearing,
       zoom: zoom ?? this.zoom,
-              mapZoom: mapZoom ?? this.mapZoom,
+      mapZoom: mapZoom ?? this.mapZoom,
+      controller: controller ?? this.controller,
     )
       ..markers.addAll(markers)
       ..polyLines.addAll(polyLines)

@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 
 import 'package:latlong2/latlong.dart' as ll;
 import 'package:image_multi_type/image_multi_type.dart';
+import 'package:map_package/map/utile.dart';
 
 import 'package:qareeb_models/global.dart';
 
@@ -20,8 +21,11 @@ import '../../bloc/ather_cubit/ather_cubit.dart';
 import '../../bloc/map_controller_cubit/map_controller_cubit.dart';
 import '../../bloc/set_point_cubit/map_control_cubit.dart';
 import '../../data/models/my_marker.dart';
+import 'map_type_spinner.dart';
 
 bool isAppleTestFromMapPackage = false;
+
+final List<String> imeis = [];
 
 class MapWidget extends StatefulWidget {
   const MapWidget({
@@ -241,10 +245,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
     );
   }
 
-  var stream = Stream.periodic(Duration(
-    seconds: 15,
-    hours: isAppleTestFromMapPackage ? 10 : 0,
-  ));
+  Timer? timer;
 
   @override
   void initState() {
@@ -263,12 +264,18 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
       }
     });
     context.read<AtherCubit>().getDriverLocation(imeis);
-    stream.takeWhile((element) {
-      return mounted;
-    }).listen((event) {
-      if (!mounted) return;
-      context.read<AtherCubit>().getDriverLocation(imeis);
-    });
+    if (widget.atherListener) {
+      timer = Timer.periodic(
+        Duration(
+          seconds: 15,
+          hours: isAppleTestFromMapPackage ? 10 : 0,
+        ),
+        (timer) {
+          if (!mounted) return;
+          context.read<AtherCubit>().getDriverLocation(imeis);
+        },
+      );
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       mapControllerCubit.mapHeight = mapWidgetKey.currentContext?.size?.height ?? 640.0;
@@ -279,6 +286,7 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
   @override
   void dispose() {
     controller.dispose();
+    timer?.cancel();
     _streamController.close();
     super.dispose();
   }
@@ -319,103 +327,6 @@ class MapWidgetState extends State<MapWidget> with TickerProviderStateMixin {
 
 //---------------------------------------
 
-final mapTypeList = [
-  SpinnerItem(name: 'خريطة عادية', id: MyMapType.normal.index),
-  SpinnerItem(name: 'قمر صناعي', id: MyMapType.word.index),
-  SpinnerItem(name: 'مختلطة', id: MyMapType.mix.index),
-];
 
-class MapTypeSpinner extends StatelessWidget {
-  const MapTypeSpinner({Key? key, required this.controller}) : super(key: key);
 
-  final MapController controller;
 
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: 30.0.h,
-      right: 10.0.w,
-      child: PopupMenuButton<MyMapType>(
-        initialValue: context.read<MapControlCubit>().state.type,
-        onSelected: (MyMapType item) {
-          context.read<MapControlCubit>().changeMapType(item, controller.center.gll);
-        },
-        child: const Card(
-          elevation: 3.0,
-          color: Color(0xFFF5F5F5),
-          child: Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Icon(Icons.layers_rounded, color: Colors.green),
-          ),
-        ),
-        itemBuilder: (BuildContext context) {
-          return <PopupMenuEntry<MyMapType>>[
-            const PopupMenuItem<MyMapType>(
-              value: MyMapType.normal,
-              child: Text('خريطة عادية'),
-            ),
-            const PopupMenuItem<MyMapType>(
-              value: MyMapType.word,
-              child: Text('قمر صناعي'),
-            ),
-            const PopupMenuItem<MyMapType>(
-              value: MyMapType.mix,
-              child: Text('مختلطة'),
-            ),
-          ];
-        },
-      ),
-      // child: SpinnerWidget(
-      //   items: mapTypeList,
-      //   width: 50.0.w,
-      //   dropdownWidth: 200.0.w,
-      //   customButton: MyCardWidget(
-      //     elevation: 10.0,
-      //     padding: const EdgeInsets.all(10.0).r,
-      //     cardColor: AppColorManager.lightGray,
-      //     child: const Icon(Icons.layers_rounded, color: AppColorManager.mainColor),
-      //   ),
-      //   onChanged: (p0) {
-      //     context
-      //         .read<MapControlCubit>()
-      //         .changeMyMapType(MyMapType.values[p0.id], controller.center);
-      //   },
-      // ),
-    );
-  }
-}
-
-extension DoubleHealper on double {
-  int get getZoomMarkerCount {
-    if (this >= 11 && this < 12 || this < 10) return 10;
-    if (this >= 12 && this < 13) return 15;
-    if (this >= 13 && this < 14) return 30;
-    if (this >= 14 && this < 15) return 40;
-    if (this > 15) return 100000;
-
-    return 100000;
-  }
-}
-
-extension LatLngHealper on google.LatLng {
-  ll.LatLng get ll2 => ll.LatLng(latitude, longitude);
-}
-
-extension GLatLngHealper on ll.LatLng {
-  google.LatLng get gll => google.LatLng(latitude, longitude);
-}
-
-final List<String> imeis = [];
-
-const initialPoint = google.LatLng(33.514631885313264, 36.27654397981723);
-const initialPointBaghdad = google.LatLng(33.313120604340895, 44.37581771812867);
-
-class CachedTileProvider extends TileProvider {
-  @override
-  ImageProvider<Object> getImage(TileCoordinates coordinates, TileLayer options) {
-    return CachedNetworkImageProvider(
-      getTileUrl(coordinates, options),
-      //Now you can set options that determine how the image gets cached via whichever plugin you use.
-    );
-  }
-}
