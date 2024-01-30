@@ -6,6 +6,8 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 import 'package:latlong2/latlong.dart' as ll;
+import 'package:map_package/api_manager/api_service.dart';
+import 'package:map_package/map/bloc/map_controller_cubit/map_controller_cubit.dart';
 import 'package:qareeb_models/extensions.dart';
 import 'package:qareeb_models/global.dart';
 import 'package:qareeb_models/trip_path/data/models/trip_path.dart';
@@ -74,7 +76,7 @@ extension PathMap on TripPath {
     final list = <MyPolyLine>[];
 
     edges.forEachIndexed((i, e) {
-      list.add(MyPolyLine(key: i, encodedPolyLine: e.steps));
+      list.add(MyPolyLine(key: i, encodedPolyLine: e.steps,color: getColor(i)));
     });
 
     return list;

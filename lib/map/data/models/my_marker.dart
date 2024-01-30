@@ -262,11 +262,11 @@ class MyMarker {
     switch (type) {
       case MyMarkerType.location:
         return (costumeMarker ??
-            ImageMultiType(
-              url: Assets.iconsMainColorMarker,
-              height: 100.0.r,
-              width: 100.0.r,
-            ))
+                ImageMultiType(
+                  url: Assets.iconsMainColorMarker,
+                  height: 100.0.r,
+                  width: 100.0.r,
+                ))
             .toBitmapDescriptor(
           logicalSize: markerSize ?? Size(100.0.r, 100.0.r),
           imageSize: markerSize ?? Size(100.0.r, 100.0.r),
@@ -274,54 +274,54 @@ class MyMarker {
       case MyMarkerType.bus:
       case MyMarkerType.driver:
         return (costumeMarker ??
-            ImageMultiType(
-              url: Assets.iconsCarTopView,
-              height: 40.0.spMin,
-              width: 40.0.spMin,
-            ))
+                ImageMultiType(
+                  url: Assets.iconsCarTopView,
+                  height: 91.0.spMin,
+                  width: 91.0.spMin,
+                ))
             .toBitmapDescriptor(
           logicalSize: markerSize ?? Size(100.0.r, 100.0.r),
           imageSize: markerSize ?? Size(100.0.r, 100.0.r),
         );
       case MyMarkerType.point:
         return (costumeMarker ??
-            ImageMultiType(
-              url: Assets.iconsMainColorMarker,
-              height: 100.0.r,
-              width: 100.0.r,
-              color: Colors.black,
-            ))
+                ImageMultiType(
+                  url: Assets.iconsMainColorMarker,
+                  height: 100.0.r,
+                  width: 100.0.r,
+                  color: Colors.black,
+                ))
             .toBitmapDescriptor(
           logicalSize: markerSize ?? Size(100.0.r, 100.0.r),
           imageSize: markerSize ?? Size(100.0.r, 100.0.r),
         );
       case MyMarkerType.sharedPint:
         return (costumeMarker ??
-            Column(
-              children: [
-                if (nou.isNotEmpty)
-                  Container(
-                    height: 70.0.r,
-                    width: 100.0.r,
-                    margin: EdgeInsets.only(bottom: 5.0.r),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5.0.r),
+                Column(
+                  children: [
+                    if (nou.isNotEmpty)
+                      Container(
+                        height: 70.0.r,
+                        width: 100.0.r,
+                        margin: EdgeInsets.only(bottom: 5.0.r),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5.0.r),
+                        ),
+                        alignment: Alignment.center,
+                        child: DrawableText(
+                          text: '$nou مقعد',
+                          color: Colors.black,
+                          size: 12.0.sp,
+                        ),
+                      ),
+                    ImageMultiType(
+                      url: index.iconPoint,
+                      height: 91.0.r,
+                      width: 91.0.r,
                     ),
-                    alignment: Alignment.center,
-                    child: DrawableText(
-                      text: '$nou مقعد',
-                      color: Colors.black,
-                      size: 12.0.sp,
-                    ),
-                  ),
-                ImageMultiType(
-                  url: index.iconPoint,
-                  height: 70.0.r,
-                  width: 70.0.r,
-                ),
-              ],
-            ))
+                  ],
+                ))
             .toBitmapDescriptor(
           logicalSize: markerSize ?? Size(100.0.r, 100.0.r),
           imageSize: markerSize ?? Size(100.0.r, 100.0.r),
@@ -334,13 +334,13 @@ class MyMarker {
     required num key,
     Function(MyMarker marker)? onTapMarker,
   }) async {
-        return google_map.Marker(
-          markerId: google_map.MarkerId(key.toString()),
-          position: point,
-            anchor: const Offset(0.5, 0.5),
-          icon:await getBitmapFromType(type, index),
-          onTap: () => onTapMarker1?.call(item),
-        );
+    return google_map.Marker(
+      markerId: google_map.MarkerId(key.toString()),
+      position: point,
+      anchor: const Offset(0.5, 0.5),
+      icon: await getBitmapFromType(type, index),
+      onTap: () => onTapMarker1?.call(item),
+    );
   }
 
   @override

@@ -39,11 +39,11 @@ dependencies:
 #    path: ../../packages/qareeb_models
 
 
-  google_maps_flutter: ^2.5.0
+  google_maps_flutter: ^2.5.3
   flutter_bloc: any
   widget_to_marker: any
   #  dartz: ^0.10.1
-  equatable: ^2.0.5
+  equatable: any
   get_it: any
   internet_connection_checker: ^1.0.0+1
   http: any

@@ -98,9 +98,10 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addPath({required TripPath path,
-    Function(dynamic item)? onTapMarker,
-    bool? withPathLength}) {
+  void addPath(
+      {required TripPath path,
+      Function(dynamic item)? onTapMarker,
+      bool? withPathLength}) {
     clearMap(false);
     addMarkers(marker: path.getMarkers(onTapMarker: onTapMarker), update: false);
     addEncodedPolyLines(
@@ -221,12 +222,13 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     emit(state.copyWith(markerNotifier: state.markerNotifier + 1));
   }
 
-  void update(){
+  void update() {
     emit(state.copyWith(
       markerNotifier: state.markerNotifier + 1,
       polylineNotifier: state.polylineNotifier + 1,
     ));
   }
+
   Future<void> addPolyLine({
     required LatLng? start,
     required LatLng end,
@@ -372,16 +374,16 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     state.markers.clear();
     addMarkers(
         marker: points.mapIndexed(
-              (i, e) {
-            return MyMarker(
-              point: e.getLatLng,
-              type: MyMarkerType.point,
-              key: e.id,
-              item: e,
-              onTapMarker1: onTapMarker,
-            );
-          },
-        ).toList());
+      (i, e) {
+        return MyMarker(
+          point: e.getLatLng,
+          type: MyMarkerType.point,
+          key: e.id,
+          item: e,
+          onTapMarker1: onTapMarker,
+        );
+      },
+    ).toList());
   }
 
   void updateMarkersWithZoom(double zoom) {
@@ -410,4 +412,13 @@ double getZoomLevel(LatLng point1, LatLng point2, double width) {
       log(40075016.686 * cos(point1.latitude * pi / 180) / (256 * zoomScale)) / log(2);
 
   return zoom;
+}
+
+Color getColor(int i) {
+  if (i == 0) return Colors.black;
+  if (i == 1) return Colors.black87;
+  if (i == 2) return Colors.black54;
+  if (i == 3) return Colors.black45;
+
+  return Colors.black45;
 }

@@ -69,11 +69,11 @@ class GMapWidgetState extends State<GMapWidget> with TickerProviderStateMixin {
               final list = state.result.map((e) async {
                 final icon = await ImageMultiType(
                   url: Assets.iconsCarTopView,
-                  height: 100.0.r,
-                  width: 100.0.r,
+                  height: 150.0.r,
+                  width: 150.0.r,
                 ).toBitmapDescriptor(
-                  logicalSize: Size(100.0.r, 100.0.r),
-                  imageSize: Size(100.0.r, 100.0.r),
+                  logicalSize: Size(150.0.r, 150.0.r),
+                  imageSize: Size(150.0.r, 150.0.r),
                 );
                 return Marker(
                   markerId: MarkerId('__${e.ime}'),
@@ -98,7 +98,7 @@ class GMapWidgetState extends State<GMapWidget> with TickerProviderStateMixin {
             for (var e in listMarkers) {
               markers.add(await e);
             }
-            if(mounted) setState(() {});
+            if (mounted) setState(() {});
           },
         ),
         BlocListener<MapControllerCubit, MapControllerInitial>(
@@ -140,6 +140,7 @@ class GMapWidgetState extends State<GMapWidget> with TickerProviderStateMixin {
           target: widget.initialPoint ?? initialPoint,
           zoom: 13.0,
         ),
+        minMaxZoomPreference: const MinMaxZoomPreference(0, 16.5),
         onMapCreated: (controller) {
           widget.onMapReady?.call(controller);
           mapControllerCubit.setGoogleMap(controller);
