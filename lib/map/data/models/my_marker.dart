@@ -12,7 +12,6 @@ import 'package:qareeb_models/global.dart';
 import 'package:qareeb_models/points/data/model/trip_point.dart';
 
 import '../../../generated/assets.dart';
-import '../response/ather_response.dart';
 
 Future<Uint8List> getBytesFromAsset(String path, num width) async {
   final data = await rootBundle.load(path);

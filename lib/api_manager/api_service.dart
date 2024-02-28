@@ -1,14 +1,9 @@
 import 'dart:convert';
 
-import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:path/path.dart';
 import 'package:qareeb_models/extensions.dart';
-
 
 import 'api_url.dart';
 

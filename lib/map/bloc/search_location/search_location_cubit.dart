@@ -10,7 +10,6 @@ import '../../../api_manager/api_service.dart';
 import '../../../api_manager/pair_class.dart';
 import '../../../api_manager/server_proxy/server_proxy_request.dart';
 import '../../../api_manager/server_proxy/server_proxy_service.dart';
-import '../../../error_manager.dart';
 import '../../data/response/search_location_response.dart';
 
 part 'search_location_state.dart';

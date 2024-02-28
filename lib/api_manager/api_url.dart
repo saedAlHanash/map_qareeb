@@ -1,7 +1,3 @@
-import 'package:map_package/api_manager/api_service.dart';
-
-import '../map/ui/widget/map_widget.dart';
-import 'dart:io';
 
 class PostUrl {
   static const serverProxy =

@@ -11,7 +11,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google;
 
 import 'package:latlong2/latlong.dart' as ll;
 import 'package:image_multi_type/image_multi_type.dart';
-import 'package:qareeb_models/extensions.dart';
 
 import 'package:qareeb_models/global.dart';
 
