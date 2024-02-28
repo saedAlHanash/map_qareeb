@@ -76,7 +76,7 @@ extension PathMap on TripPath {
     final list = <MyPolyLine>[];
 
     edges.forEachIndexed((i, e) {
-      list.add(MyPolyLine(key: i, encodedPolyLine: e.steps,color: getColor(i)));
+      list.add(MyPolyLine(key: i, encodedPolyLine: e.steps, color: getColor(i)));
     });
 
     return list;
@@ -93,7 +93,6 @@ extension NormalTripMap on Trip {
     ];
   }
 }
-
 
 class PathLengthWidget extends StatelessWidget {
   const PathLengthWidget({super.key, required this.text});
