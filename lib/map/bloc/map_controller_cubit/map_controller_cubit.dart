@@ -23,7 +23,7 @@ import '../../../api_manager/api_service.dart';
 import '../../../api_manager/pair_class.dart';
 import '../../data/models/my_marker.dart';
 import '../ather_cubit/ather_cubit.dart';
-
+import 'package:geolocator/geolocator.dart';
 part 'map_controller_state.dart';
 
 const _singleMarkerKey = -5622;
@@ -32,7 +32,7 @@ extension PathMap on TripPath {
   List<MyMarker> getMarkers({Function(dynamic item)? onTapMarker}) {
     final list = <MyMarker>[];
     edges.forEachIndexed(
-      (i, e) {
+          (i, e) {
         if (i == 0) {
           list.add(
               MyMarker(point: e.startPoint.getLatLng, type: MyMarkerType.sharedPint));
@@ -128,10 +128,9 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     }
   }
 
-  void addPath(
-      {required TripPath path,
-      Function(dynamic item)? onTapMarker,
-      bool? withPathLength}) {
+  void addPath({required TripPath path,
+    Function(dynamic item)? onTapMarker,
+    bool? withPathLength}) {
     clearMap(false);
     addMarkers(marker: path.getMarkers(onTapMarker: onTapMarker), update: false);
     addEncodedPolyLines(
@@ -426,16 +425,16 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
     state.markers.clear();
     addMarkers(
         marker: points.mapIndexed(
-      (i, e) {
-        return MyMarker(
-          point: e.getLatLng,
-          type: MyMarkerType.point,
-          key: e.id,
-          item: e,
-          onTapMarker1: onTapMarker,
-        );
-      },
-    ).toList());
+              (i, e) {
+            return MyMarker(
+              point: e.getLatLng,
+              type: MyMarkerType.point,
+              key: e.id,
+              item: e,
+              onTapMarker1: onTapMarker,
+            );
+          },
+        ).toList());
   }
 
   void updateMarkersWithZoom(double zoom) {
@@ -443,7 +442,18 @@ class MapControllerCubit extends Cubit<MapControllerInitial> {
   }
 }
 
+///in meter
 double distanceBetween(LatLng point1, LatLng point2) {
+  return Geolocator.distanceBetween(
+    point1.latitude,
+    point1.longitude,
+    point2.latitude,
+    point2.longitude,
+
+  );
+}
+
+double _distanceBetween(LatLng point1, LatLng point2) {
   const p = 0.017453292519943295;
   final a = 0.5 -
       cos((point2.latitude - point1.latitude) * p) / 2 +
@@ -458,7 +468,7 @@ double getZoomLevel(LatLng point1, LatLng point2, double width) {
   if (point1.hashCode == point2.hashCode) {
     return 13.0;
   }
-  final distance = distanceBetween(point1, point2) * 1000;
+  final distance = _distanceBetween(point1, point2) * 1000;
   final zoomScale = distance / (width * 0.6);
   final zoom =
       log(40075016.686 * cos(point1.latitude * pi / 180) / (256 * zoomScale)) / log(2);
