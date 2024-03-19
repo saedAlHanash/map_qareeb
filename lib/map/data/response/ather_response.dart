@@ -109,7 +109,7 @@ class Ime {
       plateNumber: json["plate_number"] ?? "",
       odometer: json["odometer"] ?? "",
       engineHours: json["engine_hours"] ?? "",
-      params: Params.fromJson(json["params"]! is Map ? {} : json["params"] ?? {}),
+      params: Params.fromJson(json["params"] is! Map ? {} : json["params"] ?? {}),
     );
   }
 
