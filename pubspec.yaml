@@ -47,9 +47,9 @@ dependencies:
   get_it: any
   internet_connection_checker: ^1.0.0+1
   http: any
-  flutter_map: ^4.0.0
+  flutter_map: any
   logger: any
-  flutter_map_animations: ^0.3.0
+  flutter_map_animations: any
 #  dropdown_button2: ^2.3.9
   geolocator: any
   collection: any
